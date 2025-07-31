@@ -103,10 +103,17 @@ The game features a modular UI with four main components:
 
 #### **Enemy System** (`enemy.lua`)
 - **Multiple enemy types** - Goblins, Orcs, and Skeletons
-- **AI behaviors** - Chase player when in range, random movement
+- **Enemy management** - Creation, spawning, and lifecycle handling
 - **Combat system** - Damage players when adjacent
 - **Different stats** - Health, damage, movement patterns per type
-- **Smart pathfinding** - Move towards player when detected
+- **Modular AI integration** - Uses dedicated AI module for behaviors
+
+#### **Enemy AI System** (`enemy/ai.lua`)
+- **Behavioral patterns** - Aggressive, defensive, and guard behaviors
+- **Smart pathfinding** - A* approach with obstacle avoidance
+- **Detection systems** - Line of sight and aggro range mechanics
+- **Multiple AI types** - Different strategies per enemy type
+- **Advanced behaviors** - Chase, flee, patrol, and group coordination
 
 #### **Room Generation** (`room.lua`)
 - **Procedural room layout** with ASCII walls
@@ -125,7 +132,9 @@ fun_ascii_roguelike/
 ├── game/
 │   ├── room.lua          # Room generation and layout functions
 │   ├── player.lua        # Player creation, movement, and combat
-│   ├── enemy.lua         # Enemy AI, types, and behavior systems
+│   ├── enemy.lua         # Enemy creation, management, and combat
+│   ├── enemy/
+│   │   └── ai.lua        # Enemy AI behaviors and pathfinding
 │   ├── ui.lua            # Main UI controller
 │   └── ui/
 │       ├── titleSection.lua   # Game title and info

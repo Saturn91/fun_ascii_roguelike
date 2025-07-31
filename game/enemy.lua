@@ -1,6 +1,9 @@
 -- Enemy module for ASCII Roguelike
 local Enemy = {}
 
+-- Import AI module
+local EnemyAI = require("game.enemy.ai")
+
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
 local Player = require("game.player")
@@ -89,40 +92,9 @@ function Enemy.remove(enemy)
 end
 
 -- Clear all enemies
+-- Clear all enemies
 function Enemy.clear()
     enemies = {}
-end
-
--- Calculate distance between two points
-local function distance(x1, y1, x2, y2)
-    return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
-end
-
--- Check if enemy can see/reach the player
-function Enemy.canSeePlayer(enemy, player)
-    local dist = distance(enemy.x, enemy.y, player.x, player.y)
-    return dist <= enemy.aggroRange
-end
-
--- Get direction towards target
-local function getDirectionTo(fromX, fromY, toX, toY)
-    local dx = toX - fromX
-    local dy = toY - fromY
-    
-    -- Normalize to -1, 0, or 1
-    if dx > 0 then dx = 1 elseif dx < 0 then dx = -1 else dx = 0 end
-    if dy > 0 then dy = 1 elseif dy < 0 then dy = -1 else dy = 0 end
-    
-    return dx, dy
-end
-
--- Move enemy towards target position
-function Enemy.moveTowards(enemy, targetX, targetY, gameGrid, gridWidth, gridHeight)
-    local dx, dy = getDirectionTo(enemy.x, enemy.y, targetX, targetY)
-    local newX = enemy.x + dx
-    local newY = enemy.y + dy
-    
-    return Enemy.moveTo(enemy, newX, newY, gameGrid, gridWidth, gridHeight)
 end
 
 -- Move enemy to new position if valid
@@ -150,33 +122,17 @@ function Enemy.moveTo(enemy, newX, newY, gameGrid, gridWidth, gridHeight)
     return false
 end
 
--- AI behavior for a single enemy
+-- AI behavior for a single enemy (delegates to AI module)
 function Enemy.updateAI(enemy, player, gameGrid, gridWidth, gridHeight)
-    -- Don't move if enemy is dead
-    if enemy.health <= 0 then
-        return
-    end
+    -- Use the AI module to determine behavior
+    local action = EnemyAI.updateBehavior(enemy, player, gameGrid, gridWidth, gridHeight)
     
-    -- Check if player is adjacent (combat range)
-    local dist = distance(enemy.x, enemy.y, player.x, player.y)
-    if dist <= 1.5 then -- Adjacent (including diagonals)
-        -- Attack the player
+    -- Handle attack action
+    if action == "attack" then
         Enemy.attackPlayer(enemy, player)
-        return
     end
     
-    -- Check if enemy should chase the player
-    if Enemy.canSeePlayer(enemy, player) then
-        -- Move towards player
-        Enemy.moveTowards(enemy, player.x, player.y, gameGrid, gridWidth, gridHeight)
-    else
-        -- Random movement chance
-        if math.random() < enemy.moveChance then
-            local directions = {{0,1}, {0,-1}, {1,0}, {-1,0}}
-            local dir = directions[math.random(#directions)]
-            Enemy.moveTo(enemy, enemy.x + dir[1], enemy.y + dir[2], gameGrid, gridWidth, gridHeight)
-        end
-    end
+    return action
 end
 
 -- Enemy attacks the player
