@@ -5,6 +5,7 @@
 Logger = require("game.ui.logger")
 
 -- Import game modules
+local Fonts = require("fonts")
 local Room = require("game.room")
 local Player = require("game.player")
 local UI = require("game.ui")
@@ -13,23 +14,9 @@ function love.load()
     -- Set up the game window
     love.window.setTitle("ASCII Roguelike")
     
-    local fontSize = 12    
-    local fontPath = "assets/fonts/DejaVuSansMono.ttf"
-    if love.filesystem.getInfo(fontPath) then
-        font = love.graphics.newFont(fontPath, fontSize)
-        print("Loaded White Rabbit font successfully!")
-    else
-        -- Fallback to system font if White Rabbit isn't found
-        font = love.graphics.newFont(fontSize)
-        print("White Rabbit font not found, using system font")
-    end
-    
-    love.graphics.setFont(font)
-    
-    -- Calculate character dimensions for grid-based ASCII display
-    local testChar = "M" -- Use 'M' as it's typically the widest character
-    charWidth = font:getWidth(testChar)
-    charHeight = font:getHeight()
+    -- Initialize font system
+    local fontSize = 12
+    font, fontName, charWidth, charHeight = Fonts.init(fontSize)
     
     -- Set up game grid dimensions
     local windowWidth = 1024
