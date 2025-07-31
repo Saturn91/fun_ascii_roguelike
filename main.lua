@@ -11,6 +11,7 @@ local Room = require("game.room")
 local Player = require("game.player")
 local Enemy = require("game.enemy")
 local UI = require("game.ui")
+local MapGenerator = require("game.mapGenerator")
 
 function love.load()
     -- Set up the game window
@@ -39,8 +40,8 @@ function love.load()
     Player.setUI(UI)
     Enemy.setUI(UI)
     
-    -- Generate the room layout using the Room module (only in game area)
-    Room.generateDefaultLayout(gameGrid, gameAreaWidth, gameAreaHeight)
+    -- Generate the room layout using the MapGenerator module (only in game area)
+    MapGenerator.generate(gameGrid, gameAreaWidth, gameAreaHeight)
     
     -- Create and position the player using the Player module
     local startX, startY = Room.findPlayerStartPosition(gameGrid, gameAreaWidth, gameAreaHeight)

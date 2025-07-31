@@ -115,10 +115,18 @@ The game features a modular UI with four main components:
 - **Multiple AI types** - Different strategies per enemy type
 - **Advanced behaviors** - Chase, flee, patrol, and group coordination
 
-#### **Room Generation** (`room.lua`)
-- **Procedural room layout** with ASCII walls
-- **Multiple interconnected rooms** with corridors
-- **Collision detection** for walls and boundaries
+#### **Map Generation** (`mapGenerator.lua`)
+- **Procedural room generation** - Creates non-overlapping rooms
+- **Configurable parameters** - Room count, min/max sizes
+- **Collision detection** - Ensures rooms don't overlap
+- **Smart placement** - Automatic room positioning with buffer zones
+- **Extensible design** - Ready for corridor generation and advanced features
+
+#### **Room System** (`room.lua`)
+- **Map generator integration** - Uses procedural generation
+- **Player placement** - Smart starting position selection
+- **Room management** - Stores and manages generated rooms
+- **Legacy compatibility** - Maintains existing interface
 
 ## Code Structure
 
@@ -130,7 +138,8 @@ fun_ascii_roguelike/
 ├── asciiGrid.lua         # ASCII grid rendering and management
 ├── Colors.lua            # Color palette and markup parser
 ├── game/
-│   ├── room.lua          # Room generation and layout functions
+│   ├── room.lua          # Room system and player placement
+│   ├── mapGenerator.lua  # Procedural dungeon generation
 │   ├── player.lua        # Player creation, movement, and combat
 │   ├── enemy.lua         # Enemy creation, management, and combat
 │   ├── enemy/
