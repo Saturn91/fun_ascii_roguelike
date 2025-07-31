@@ -15,7 +15,7 @@ local BORDER_CHARS = {
 }
 
 -- Logger configuration
-local MAX_LOG_MESSAGES = 20
+local MAX_LOG_MESSAGES = 37
 local logMessages = {}
 
 -- Initialize the UI system
@@ -82,6 +82,9 @@ end
 
 -- Draw the entire UI
 function UI.draw(gameGrid, player)
+    -- Clear UI area with empty/black background
+    UI.clearUIArea(gameGrid)
+    
     -- Draw game area border
     UI.drawGameAreaBorder(gameGrid)
     
@@ -93,6 +96,22 @@ function UI.draw(gameGrid, player)
     
     -- Draw info panel content
     UI.drawInfoPanel(gameGrid, player)
+end
+
+-- Clear the UI area with black background (empty cells)
+function UI.clearUIArea(gameGrid)
+    -- Clear the entire UI area
+    for y = UI.uiArea.y, UI.uiArea.y + UI.uiArea.height - 1 do
+        for x = UI.uiArea.x, UI.uiArea.x + UI.uiArea.width - 1 do
+            if y <= #gameGrid and x <= #gameGrid[y] then
+                gameGrid[y][x] = {
+                    char = " ",  -- Space character for clean background
+                    color = {0, 0, 0},  -- Black color
+                    walkable = false
+                }
+            end
+        end
+    end
 end
 
 -- Draw border around the game area

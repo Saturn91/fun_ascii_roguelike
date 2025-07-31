@@ -102,8 +102,10 @@ The game now features a dedicated ASCII UI panel on the right side (25% of scree
 
 ### **Visual Elements**
 - ASCII borders (`|`, `-`, `+`) separate game area from UI
+- **Clean black background** in UI areas for better readability
 - Color-coded sections for easy reading
 - All UI elements rendered using ASCII characters
+- No visual clutter - only relevant UI elements are drawn
 
 ## Next Steps
 

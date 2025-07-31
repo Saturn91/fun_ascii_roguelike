@@ -87,7 +87,7 @@ function love.draw()
     for y = 1, gridHeight do
         for x = 1, gridWidth do
             local cell = gameGrid[y][x]
-            if cell and cell.char then
+            if cell and cell.char and cell.char ~= " " then  -- Don't render space characters
                 love.graphics.setColor(cell.color)
                 love.graphics.print(cell.char, (x-1) * charWidth, (y-1) * charHeight)
             end
