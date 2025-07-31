@@ -8,9 +8,11 @@ local gridWidth = 0
 local gridHeight = 0
 local charWidth = 0
 local charHeight = 0
+local gameAreaWidth = 0
+local gameAreaHeight = 0
 
 -- Initialize the ASCII grid system
-function AsciiGrid.init(windowWidth, windowHeight, cellCharWidth, cellCharHeight)
+function AsciiGrid.init(windowWidth, windowHeight, cellCharWidth, cellCharHeight, gameAreaW, gameAreaH)
     charWidth = cellCharWidth
     charHeight = cellCharHeight
     
@@ -18,7 +20,11 @@ function AsciiGrid.init(windowWidth, windowHeight, cellCharWidth, cellCharHeight
     gridWidth = math.floor(windowWidth / charWidth)
     gridHeight = math.floor(windowHeight / charHeight)
     
-    -- Initialize game state with solid walls everywhere
+    -- Store game area dimensions for boundary checking
+    gameAreaWidth = gameAreaW or gridWidth
+    gameAreaHeight = gameAreaH or gridHeight
+    
+    -- Initialize game state
     local gameGrid = {}
     for y = 1, gridHeight do
         gameGrid[y] = {}
@@ -26,9 +32,12 @@ function AsciiGrid.init(windowWidth, windowHeight, cellCharWidth, cellCharHeight
             if y == 1 then
                 -- Top row is reserved for health bar - make it empty/black
                 gameGrid[y][x] = {char = " ", color = {0, 0, 0}, walkable = false}
-            else
-                -- All other areas start as walls
+            elseif x <= gameAreaWidth and y >= 2 and y <= gameAreaHeight + 1 then
+                -- Game area: start with walls that will be carved out by room generation
                 gameGrid[y][x] = {char = "#", color = {0.4, 0.4, 0.4}, walkable = false} -- Dark gray walls
+            else
+                -- Outside game area: empty space (UI area or borders)
+                gameGrid[y][x] = {char = " ", color = {0, 0, 0}, walkable = false}
             end
         end
     end
@@ -145,9 +154,12 @@ function AsciiGrid.reset(grid)
             if y == 1 then
                 -- Top row is reserved for health bar - make it empty/black
                 grid[y][x] = {char = " ", color = {0, 0, 0}, walkable = false}
-            else
-                -- All other areas start as walls
+            elseif x <= gameAreaWidth and y >= 2 and y <= gameAreaHeight + 1 then
+                -- Game area: start with walls that will be carved out by room generation
                 grid[y][x] = {char = "#", color = {0.4, 0.4, 0.4}, walkable = false}
+            else
+                -- Outside game area: empty space (UI area or borders)
+                grid[y][x] = {char = " ", color = {0, 0, 0}, walkable = false}
             end
         end
     end

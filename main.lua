@@ -25,11 +25,15 @@ function love.load()
     local windowHeight = 768
     love.window.setMode(windowWidth, windowHeight)
     
-    -- Initialize ASCII grid system
-    gameGrid, gridWidth, gridHeight = AsciiGrid.init(windowWidth, windowHeight, charWidth, charHeight)
+    -- Calculate initial grid dimensions for UI system
+    local tempGridWidth = math.floor(windowWidth / charWidth)
+    local tempGridHeight = math.floor(windowHeight / charHeight)
     
     -- Initialize UI system and get adjusted game area dimensions
-    local gameAreaWidth, gameAreaHeight = UI.init(gridWidth, gridHeight, charWidth, charHeight)
+    local gameAreaWidth, gameAreaHeight = UI.init(tempGridWidth, tempGridHeight, charWidth, charHeight)
+    
+    -- Initialize ASCII grid system with game area boundaries
+    gameGrid, gridWidth, gridHeight = AsciiGrid.init(windowWidth, windowHeight, charWidth, charHeight, gameAreaWidth, gameAreaHeight)
     
     -- Set up UI reference for Player and Enemy modules
     Player.setUI(UI)
