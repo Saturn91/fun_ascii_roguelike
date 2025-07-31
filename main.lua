@@ -13,12 +13,8 @@ function love.load()
     -- Set up the game window
     love.window.setTitle("ASCII Roguelike")
     
-    -- Try to load a monospace font for ASCII art
-    -- Using White Rabbit font - perfect for roguelikes!
-    local fontSize = 16
-    
-    -- Load the White Rabbit font (whitrabt.ttf)
-    local fontPath = "assets/fonts/whitrabt.ttf"
+    local fontSize = 12    
+    local fontPath = "assets/fonts/DejaVuSansMono.ttf"
     if love.filesystem.getInfo(fontPath) then
         font = love.graphics.newFont(fontPath, fontSize)
         print("Loaded White Rabbit font successfully!")
