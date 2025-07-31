@@ -54,6 +54,9 @@ function love.load()
     local startX, startY = Room.findPlayerStartPosition(gameGrid, gameAreaWidth, gameAreaHeight)
     player = Player.new(startX, startY, 10)
     Player.placeOnGrid(player, gameGrid)
+    
+    -- Add welcome messages with color markup
+    Logger.log("[gold]Welcome to ASCII Roguelike![/gold]")
 end
 
 function love.update(dt)

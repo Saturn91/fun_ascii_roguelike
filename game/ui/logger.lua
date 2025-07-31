@@ -1,6 +1,9 @@
 -- Logger module for ASCII Roguelike UI
 local Logger = {}
 
+-- Import Colors module for markup parsing
+local Colors = require("Colors")
+
 -- Logger configuration
 local MAX_LOG_MESSAGES = 27
 local logMessages = {}
@@ -18,7 +21,47 @@ function Logger.log(message)
     end
 end
 
--- Wrap text to fit within specified width
+-- Wrap colored text segments to fit within specified width
+function Logger.wrapColoredText(segments, maxWidth)
+    local lines = {}
+    local currentLine = {}
+    local currentLength = 0
+    
+    for _, segment in ipairs(segments) do
+        local words = {}
+        for word in segment.text:gmatch("%S+") do
+            table.insert(words, word)
+        end
+        
+        for _, word in ipairs(words) do
+            if currentLength + #word + (currentLength > 0 and 1 or 0) <= maxWidth then
+                -- Add space if not first word on line
+                if currentLength > 0 then
+                    table.insert(currentLine, {text = " ", color = segment.color})
+                    currentLength = currentLength + 1
+                end
+                table.insert(currentLine, {text = word, color = segment.color})
+                currentLength = currentLength + #word
+            else
+                -- Start new line
+                if #currentLine > 0 then
+                    table.insert(lines, currentLine)
+                end
+                currentLine = {{text = word, color = segment.color}}
+                currentLength = #word
+            end
+        end
+    end
+    
+    -- Add the last line if it has content
+    if #currentLine > 0 then
+        table.insert(lines, currentLine)
+    end
+    
+    return lines
+end
+
+-- Original wrap function for backward compatibility
 function Logger.wrapText(text, maxWidth)
     local lines = {}
     local currentLine = ""
@@ -63,7 +106,7 @@ function Logger.draw(gameGrid, logArea)
         end
     end
     
-    -- Draw log messages
+    -- Draw log messages with color support
     local displayMessages = {}
     local startIdx = math.max(1, #logMessages - logArea.height + 1)
     
@@ -71,26 +114,38 @@ function Logger.draw(gameGrid, logArea)
         table.insert(displayMessages, logMessages[i])
     end
     
+    local currentY = logArea.y
     for i, message in ipairs(displayMessages) do
-        local y = logArea.y + i - 1
-        if y <= logArea.y + logArea.height - 1 then
-            -- Wrap text if it's too long
-            local wrappedLines = Logger.wrapText(message, logArea.width)
-            for lineIdx, line in ipairs(wrappedLines) do
-                local currentY = y + lineIdx - 1
-                if currentY <= logArea.y + logArea.height - 1 then
-                    for j = 1, math.min(#line, logArea.width) do
-                        local x = logArea.x + j - 1
-                        if currentY <= #gameGrid and x <= #gameGrid[currentY] then
-                            gameGrid[currentY][x] = {
-                                char = line:sub(j, j),
-                                color = {0.9, 0.9, 0.9},
-                                walkable = false
-                            }
-                        end
+        if currentY > logArea.y + logArea.height - 1 then
+            break
+        end
+        
+        -- Parse color markup in the message
+        local segments = Colors.parseMarkup(message, Colors.palette.text)
+        
+        -- Wrap the colored segments
+        local wrappedLines = Logger.wrapColoredText(segments, logArea.width)
+        
+        for lineIdx, coloredLine in ipairs(wrappedLines) do
+            if currentY > logArea.y + logArea.height - 1 then
+                break
+            end
+            
+            -- Draw each colored segment in the line
+            local x = logArea.x
+            for _, segment in ipairs(coloredLine) do
+                for charIdx = 1, #segment.text do
+                    if x <= logArea.x + logArea.width - 1 and currentY <= #gameGrid and x <= #gameGrid[currentY] then
+                        gameGrid[currentY][x] = {
+                            char = segment.text:sub(charIdx, charIdx),
+                            color = segment.color,
+                            walkable = false
+                        }
+                        x = x + 1
                     end
                 end
             end
+            currentY = currentY + 1
         end
     end
 end
