@@ -1,0 +1,86 @@
+# ASCII Roguelike - Love2D
+
+A classic ASCII-style roguelike game built with Love2D (LÖVE).
+
+## Font Recommendations
+
+For the best ASCII roguelike experience, consider using one of these fonts:
+
+### Best Options for Authentic Feel:
+1. **CP437 (Codepage 437)** - The original IBM PC font
+2. **Perfect DOS VGA 437** - Authentic DOS-era bitmap font
+3. **MS DOS Font** - Classic DOS appearance
+
+### Modern Alternatives:
+1. **Iosevka** - Modern monospace with excellent ASCII support
+2. **Source Code Pro** - Clean and readable
+3. **Fira Code** - Great monospace option
+4. **JetBrains Mono** - Designed for developers
+5. **Terminus** - Bitmap font for pixel-perfect display
+
+## Font Installation
+
+✅ **White Rabbit Font Installed!**
+The classic "White Rabbit" font by Matthew Welch is now installed in your project at:
+`assets/fonts/whitrabt.ttf`
+
+This font is perfect for ASCII roguelikes with its clean, monospace design that makes ASCII art look crisp and authentic.
+
+### If you want to use a different font:
+1. Download your preferred font (TTF or OTF format)
+2. Place the font file in `assets/fonts/`
+3. Update the font path in `main.lua`:
+   ```lua
+   local fontPath = "assets/fonts/your-font-name.ttf"
+   ```
+
+## Where to Get Fonts
+
+### Free Options:
+- **Google Fonts**: Source Code Pro, JetBrains Mono
+- **The Ultimate Oldschool PC Font Pack**: Perfect DOS VGA 437, More Perfect DOS VGA 437
+- **Iosevka**: Available on GitHub
+- **GNU FreeFont**: FreeMono
+
+### Font Websites:
+- [The Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/)
+- [Google Fonts](https://fonts.google.com/)
+- [Iosevka GitHub](https://github.com/be5invis/Iosevka)
+
+## Running the Game
+
+1. Install Love2D from [love2d.org](https://love2d.org/)
+2. Either:
+   - Drag the game folder onto the Love2D executable
+   - Or run from command line: `love .` (in the game directory)
+
+## Controls
+
+- **Arrow Keys** or **WASD**: Move player
+- **Escape**: Quit game
+
+## Current Features
+
+- Basic ASCII grid rendering
+- Player movement (@)
+- Configurable font system
+- Grid-based movement system
+
+## Next Steps
+
+- [ ] Add walls and rooms
+- [ ] Implement enemies
+- [ ] Add items and inventory
+- [ ] Create dungeon generation
+- [ ] Add combat system
+- [ ] Implement line of sight/fog of war
+
+## Font Configuration
+
+The game automatically calculates character dimensions and adjusts the grid size based on your chosen font. The current setup supports:
+
+- Fallback font system (custom → default monospace → system)
+- Automatic grid sizing based on character dimensions
+- Consistent character spacing for perfect ASCII alignment
+
+Recommended font size: 14-18px for best readability.
