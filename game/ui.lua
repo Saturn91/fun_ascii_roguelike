@@ -15,7 +15,7 @@ local BORDER_CHARS = {
 }
 
 -- Logger configuration
-local MAX_LOG_MESSAGES = 37
+local MAX_LOG_MESSAGES = 27
 local logMessages = {}
 
 -- Initialize the UI system
@@ -43,12 +43,20 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         height = UI.totalHeight
     }
     
-    -- Logger area (top part of UI)
-    UI.logArea = {
+    -- Title area (top section of UI)
+    UI.titleArea = {
         x = UI.uiArea.x + 1,
         y = UI.uiArea.y + 1,
         width = UI.uiArea.width - 2,
-        height = math.floor(UI.totalHeight * 0.6) - 2
+        height = 8  -- Space for title, version, and author
+    }
+    
+    -- Logger area (moved down to make room for title)
+    UI.logArea = {
+        x = UI.uiArea.x + 1,
+        y = UI.titleArea.y + UI.titleArea.height + 2,  -- Position after title area + border
+        width = UI.uiArea.width - 2,
+        height = math.floor(UI.totalHeight * 0.6) - 2 - UI.titleArea.height - 2  -- Adjust for title space
     }
     
     -- Info area (bottom part of UI)
@@ -71,8 +79,8 @@ end
 function UI.log(message)
     local timestamp = os.date("%H:%M:%S")
     local logEntry = string.format("[%s] %s", timestamp, tostring(message))
-    
-    table.insert(logMessages, logEntry)
+    print(logEntry)
+    table.insert(logMessages, tostring(message))
     
     -- Remove old messages if we exceed the limit
     while #logMessages > MAX_LOG_MESSAGES do
@@ -90,6 +98,9 @@ function UI.draw(gameGrid, player)
     
     -- Draw UI panel border
     UI.drawUIPanelBorder(gameGrid)
+    
+    -- Draw title section
+    UI.drawTitleSection(gameGrid)
     
     -- Draw logger content
     UI.drawLogger(gameGrid)
@@ -172,6 +183,18 @@ function UI.drawUIPanelBorder(gameGrid)
         end
     end
     
+    -- Separator between title and log areas
+    local titleSepY = UI.titleArea.y + UI.titleArea.height + 1
+    for x = uiX, uiX + uiW - 1 do
+        if titleSepY <= #gameGrid and x <= #gameGrid[titleSepY] then
+            gameGrid[titleSepY][x] = {
+                char = BORDER_CHARS.horizontal,
+                color = {0.7, 0.7, 0.7},
+                walkable = false
+            }
+        end
+    end
+    
     -- Separator between log and info areas
     local sepY = UI.logArea.y + UI.logArea.height + 1
     for x = uiX, uiX + uiW - 1 do
@@ -181,6 +204,48 @@ function UI.drawUIPanelBorder(gameGrid)
                 color = {0.7, 0.7, 0.7},
                 walkable = false
             }
+        end
+    end
+end
+
+-- Draw the title section content
+function UI.drawTitleSection(gameGrid)
+    local titleLines = {
+        "ASCII ROGUELIKE",
+        "---------------",
+        "Version: 1.0.0",
+        "",
+        "Made by:",
+        "Saturn91.dev"
+    }
+    
+    for i, line in ipairs(titleLines) do
+        local y = UI.titleArea.y + i - 1
+        if y <= UI.titleArea.y + UI.titleArea.height - 1 then
+            -- Center all title lines
+            local startX = UI.titleArea.x + math.floor((UI.titleArea.width - #line) / 2)
+            
+            for j = 1, math.min(#line, UI.titleArea.width) do
+                local x = startX + j - 1
+                if y <= #gameGrid and x <= #gameGrid[y] then
+                    local color = {0.9, 0.9, 0.9}  -- Default white
+                    
+                    -- Special colors for different sections
+                    if i == 1 then  -- Title
+                        color = {1, 0.8, 0.2}  -- Gold
+                    elseif line:match("Version:") then
+                        color = {0.6, 0.8, 1}  -- Light blue
+                    elseif line:match("Saturn91.dev") then
+                        color = {0.8, 1, 0.8}  -- Light green
+                    end
+                    
+                    gameGrid[y][x] = {
+                        char = line:sub(j, j),
+                        color = color,
+                        walkable = false
+                    }
+                end
+            end
         end
     end
 end
