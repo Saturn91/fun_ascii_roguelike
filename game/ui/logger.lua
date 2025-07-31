@@ -5,7 +5,7 @@ local Logger = {}
 local Colors = require("Colors")
 
 -- Logger configuration
-local MAX_LOG_MESSAGES = 27
+local MAX_LOG_MESSAGES = 21
 local logMessages = {}
 
 -- Logger function to replace print statements
