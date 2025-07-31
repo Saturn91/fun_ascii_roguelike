@@ -10,6 +10,7 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - ✅ **Enemy AI System** - Multiple enemy types with different behaviors
 - ✅ **Combat Mechanics** - Turn-based combat with damage and health systems
 - ✅ **Pause Menu System** - In-game pause with semi-transparent overlay
+- ✅ **Game Over Screen** - Statistics display with retry/quit options
 - ✅ **Modular Architecture** - Clean, organized code structure
 - ✅ **ASCII-based UI** - Dedicated panels for logging, controls, and status
 - ✅ **Room Generation** - Procedural rooms with corridors
@@ -52,6 +53,22 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - **New Game**: Start a fresh game session
 - **Main Menu**: Return to the main menu
 - **Close**: Quit the application
+
+### Game Over Screen Controls
+- **Arrow Keys** or **W/S**: Navigate menu options
+- **Enter** or **Space**: Select option
+- **Escape**: Return to main menu
+
+### Game Over Screen Options
+- **Retry**: Start a new game immediately
+- **Main Menu**: Return to the main menu
+- **Quit**: Exit the application
+
+### Game Statistics
+When you die, the game over screen displays:
+- **Cause of death** (e.g., "Combat")
+- **Enemies defeated** during the session
+- **Time survived** in MM:SS format
 
 ## Color Markup System
 
@@ -164,6 +181,14 @@ The game features a modular UI with four main components:
 - **Non-destructive pausing** - Game continues exactly where you left off
 - **Professional visual design** - Clean overlay with proper opacity and text rendering
 
+#### **Game Over System** (`gameOverScreen.lua`)
+- **Death detection** - Automatically triggers when player health reaches zero
+- **Game statistics display** - Shows enemies killed, time survived, and cause of death
+- **Semi-transparent overlay** - Dark red tint for dramatic effect
+- **Retry functionality** - Quick restart without returning to main menu
+- **Statistics tracking** - Real-time tracking of game progress and performance
+- **Professional presentation** - Clean layout with proper visual hierarchy
+
 #### **Background Map System** (`menu/backgroundMap.lua`)
 - **Animated world generation** - Procedural dungeons with moving enemies
 - **Configurable opacity** - Adjustable background visibility
@@ -193,7 +218,8 @@ fun_ascii_roguelike/
 │   ├── controls.lua      # Keyboard input and game controls
 │   ├── menu.lua          # Main menu system
 │   ├── pauseMenu.lua     # In-game pause menu system
-│   ├── gameState.lua     # Game state management (menu/playing/paused)
+│   ├── gameOverScreen.lua # Game over screen with statistics
+│   ├── gameState.lua     # Game state management (menu/playing/paused/game_over)
 │   ├── menu/
 │   │   └── backgroundMap.lua  # Animated background world for menus
 │   ├── enemy/
@@ -236,10 +262,11 @@ fun_ascii_roguelike/
 - **Victory/defeat conditions** - Clear objectives and game over states
 
 #### **Game State Management**
-- **Three distinct states** - Menu, Playing, and Paused
+- **Four distinct states** - Menu, Playing, Paused, and Game Over
 - **Seamless transitions** - Smooth state changes without data loss
 - **State preservation** - Perfect game state maintenance during pause
 - **Clean separation** - Each state has dedicated rendering and input handling
+- **Statistics tracking** - Real-time game performance monitoring
 
 ## Future Enhancements
 
@@ -247,6 +274,7 @@ fun_ascii_roguelike/
 - [x] ~~Combat mechanics with weapons/spells~~ ✅ **Basic combat implemented!**
 - [x] ~~Pause menu system~~ ✅ **Professional pause menu implemented!**
 - [x] ~~Game state management~~ ✅ **Complete state system implemented!**
+- [x] ~~Game over screen~~ ✅ **Statistics-based game over screen implemented!**
 - [ ] Item and inventory system
 - [ ] Extended procedural dungeon generation
 - [ ] Advanced AI behaviors (group tactics, special abilities)
@@ -256,7 +284,8 @@ fun_ascii_roguelike/
 - [ ] Sound effects and music
 - [ ] Additional color themes
 - [ ] Settings/options menu
-- [ ] Game over screen with statistics
+- [ ] Multiple difficulty levels
+- [ ] High score system
 
 ## Technical Notes
 

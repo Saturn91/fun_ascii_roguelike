@@ -9,6 +9,10 @@ local UI = require("game.ui")
 local Logger = require("game.ui.logger")
 local GameState = require("game.gameState")
 local PauseMenu = require("game.pauseMenu")
+local GameOverScreen = require("game.gameOverScreen")
+
+-- Game statistics tracking
+local gameStartTime = nil
 
 -- Handle all keyboard input for the game
 function Controls.handleKeypress(key, player, gameGrid)
@@ -17,6 +21,8 @@ function Controls.handleKeypress(key, player, gameGrid)
         return Controls.handlePlayingInput(key, player, gameGrid)
     elseif GameState.isPaused() then
         return Controls.handlePauseInput(key)
+    elseif GameState.isGameOver() then
+        return Controls.handleGameOverInput(key)
     end
 end
 
@@ -49,8 +55,8 @@ function Controls.handlePlayingInput(key, player, gameGrid)
         
         -- Check if player died
         if not Player.isAlive(player) then
-            Logger.log("[error]Game Over! You have died![/error]")
-            Logger.log("[info]Press Escape to quit[/info]")
+            Controls.triggerGameOver("Combat")
+            return
         end
         
         -- Check victory condition
@@ -80,6 +86,55 @@ function Controls.handlePauseInput(key)
     elseif action == "quit" then
         love.event.quit()
     end
+end
+
+-- Handle input during game over screen
+function Controls.handleGameOverInput(key)
+    local action = GameOverScreen.handleInput(key)
+    
+    if action == "retry" then
+        GameState.setState(GameState.STATES.PLAYING)
+        Logger.log("[success]Starting new game![/success]")
+        return "new_game"  -- Signal to main.lua to restart
+    elseif action == "main_menu" then
+        GameState.setState(GameState.STATES.MENU)
+        Logger.log("[info]Returning to main menu[/info]")
+        return "main_menu"  -- Signal to main.lua to reset
+    elseif action == "quit" then
+        love.event.quit()
+    end
+end
+
+-- Trigger game over with cause
+function Controls.triggerGameOver(cause)
+    local timeAlive = Controls.getGameTime()
+    local stats = {
+        enemiesKilled = Enemy.getKillCount(),
+        timeAlive = timeAlive,
+        cause = cause or "Unknown"
+    }
+    
+    GameOverScreen.init(stats)
+    GameState.setState(GameState.STATES.GAME_OVER)
+    Logger.log("[error]Game Over! Cause: " .. cause .. "[/error]")
+end
+
+-- Initialize game statistics
+function Controls.initGameStats()
+    gameStartTime = love.timer.getTime()
+    Enemy.resetKillCount()
+end
+
+-- Get formatted game time
+function Controls.getGameTime()
+    if not gameStartTime then
+        return "00:00"
+    end
+    
+    local elapsed = love.timer.getTime() - gameStartTime
+    local minutes = math.floor(elapsed / 60)
+    local seconds = math.floor(elapsed % 60)
+    return string.format("%02d:%02d", minutes, seconds)
 end
 
 return Controls

@@ -6,7 +6,8 @@ local GameState = {}
 local states = {
     MENU = "menu",
     PLAYING = "playing",
-    PAUSED = "paused"
+    PAUSED = "paused",
+    GAME_OVER = "game_over"
 }
 
 -- Current state
@@ -38,6 +39,10 @@ end
 
 function GameState.isPaused()
     return currentState == states.PAUSED
+end
+
+function GameState.isGameOver()
+    return currentState == states.GAME_OVER
 end
 
 -- Export states

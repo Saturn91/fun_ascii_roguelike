@@ -16,6 +16,7 @@ local Controls = require("game.controls")
 local Menu = require("game.menu")
 local GameState = require("game.gameState")
 local PauseMenu = require("game.pauseMenu")
+local GameOverScreen = require("game.gameOverScreen")
 
 function love.load()
     -- Set up the game window
@@ -64,6 +65,9 @@ function love.draw()
     elseif GameState.isPaused() then
         -- First draw the game as it was when paused
         UI.draw(gameGrid, player)
+    elseif GameState.isGameOver() then
+        -- First draw the game as it was when player died
+        UI.draw(gameGrid, player)
     end
     
     -- Draw the ASCII grid
@@ -72,6 +76,8 @@ function love.draw()
     -- If paused, draw the Love2D overlay on top
     if GameState.isPaused() then
         PauseMenu.draw(gridWidth, gridHeight)
+    elseif GameState.isGameOver() then
+        GameOverScreen.draw(gridWidth, gridHeight)
     end
 end
 
@@ -84,11 +90,11 @@ function love.keypressed(key)
         elseif result == "quit" then
             love.event.quit()
         end
-    elseif GameState.isPlaying() or GameState.isPaused() then
+    elseif GameState.isPlaying() or GameState.isPaused() or GameState.isGameOver() then
         -- Delegate all keyboard handling to the Controls module
         local result = Controls.handleKeypress(key, player, gameGrid)
         
-        -- Handle special results from pause menu
+        -- Handle special results from pause menu or game over screen
         if result == "new_game" then
             startNewGame()
         elseif result == "main_menu" then
@@ -127,6 +133,9 @@ function startNewGame()
     -- Add welcome messages with color markup
     Logger.log("[gold]Welcome to ASCII Roguelike![/gold]")
     Logger.log("[warning]Enemies have appeared![/warning]")
+    
+    -- Initialize game statistics
+    Controls.initGameStats()
     
     -- Switch to playing state
     GameState.setState(GameState.STATES.PLAYING)

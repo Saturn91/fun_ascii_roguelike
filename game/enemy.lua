@@ -8,6 +8,9 @@ local EnemyAI = require("game.enemy.ai")
 local UI = nil
 local Player = require("game.player")
 
+-- Kill counter
+local killCount = 0
+
 -- Initialize UI reference (called from main)
 function Enemy.setUI(uiModule)
     UI = uiModule
@@ -151,6 +154,9 @@ function Enemy.takeDamage(enemy, damage, gameGrid)
     
     if enemy.health <= 0 then
         Logger.log(string.format("[success]%s defeated![/success]", enemy.name))
+        -- Increment kill count
+        killCount = killCount + 1
+        Logger.log(string.format("[info]Enemies defeated: %d[/info]", killCount))
         -- Remove enemy from grid
         gameGrid[enemy.y][enemy.x] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
         -- Remove from enemies list
@@ -240,6 +246,16 @@ function Enemy.getTotalCount()
         end
     end
     return count
+end
+
+-- Get total enemies killed
+function Enemy.getKillCount()
+    return killCount
+end
+
+-- Reset kill count (called when starting new game)
+function Enemy.resetKillCount()
+    killCount = 0
 end
 
 return Enemy
