@@ -15,6 +15,7 @@ local MapGenerator = require("game.mapGenerator")
 local Controls = require("game.controls")
 local Menu = require("game.menu")
 local GameState = require("game.gameState")
+local PauseMenu = require("game.pauseMenu")
 
 function love.load()
     -- Set up the game window
@@ -55,15 +56,23 @@ function love.draw()
     love.graphics.clear(0, 0, 0, 1)
     
     if GameState.isMenu() then
-        -- Draw menu
-        Menu.draw(gameGrid, gridWidth, gridHeight)
+        -- Draw menu with dynamic background
+        Menu.draw(gameGrid, gridWidth, gridHeight, love.timer.getDelta())
     elseif GameState.isPlaying() then
         -- Draw the UI (this modifies the gameGrid to include UI elements)
         UI.draw(gameGrid, player)
+    elseif GameState.isPaused() then
+        -- First draw the game as it was when paused
+        UI.draw(gameGrid, player)
     end
     
-    -- Draw the ASCII grid using the AsciiGrid module
+    -- Draw the ASCII grid
     AsciiGrid.draw()
+    
+    -- If paused, draw the Love2D overlay on top
+    if GameState.isPaused() then
+        PauseMenu.draw(gridWidth, gridHeight)
+    end
 end
 
 function love.keypressed(key)
@@ -75,13 +84,23 @@ function love.keypressed(key)
         elseif result == "quit" then
             love.event.quit()
         end
-    elseif GameState.isPlaying() then
+    elseif GameState.isPlaying() or GameState.isPaused() then
         -- Delegate all keyboard handling to the Controls module
-        Controls.handleKeypress(key, player, gameGrid)
+        local result = Controls.handleKeypress(key, player, gameGrid)
+        
+        -- Handle special results from pause menu
+        if result == "new_game" then
+            startNewGame()
+        elseif result == "main_menu" then
+            returnToMainMenu()
+        end
     end
 end
 
 function startNewGame()
+    -- Clear menu background before starting game
+    Menu.clearBackground()
+    
     -- Initialize UI system and get adjusted game area dimensions
     gameAreaWidth, gameAreaHeight = UI.init(gridWidth, gridHeight, charWidth, charHeight)
     
@@ -111,4 +130,23 @@ function startNewGame()
     
     -- Switch to playing state
     GameState.setState(GameState.STATES.PLAYING)
+end
+
+function returnToMainMenu()
+    -- Clear game state
+    player = nil
+    gameAreaWidth = nil
+    gameAreaHeight = nil
+    
+    -- Clear any enemies
+    Enemy.clear()
+    
+    -- Reinitialize menu
+    Menu.init()
+    
+    -- Reinitialize ASCII grid system for menu (full screen)
+    gameGrid, gridWidth, gridHeight = AsciiGrid.init(love.graphics.getWidth(), love.graphics.getHeight(), charWidth, charHeight, math.floor(love.graphics.getWidth() / charWidth), math.floor(love.graphics.getHeight() / charHeight))
+    
+    -- Switch to menu state
+    GameState.setState(GameState.STATES.MENU)
 end

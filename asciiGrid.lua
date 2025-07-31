@@ -11,6 +11,10 @@ local charHeight = 0
 local gameAreaWidth = 0
 local gameAreaHeight = 0
 
+-- Foreground layer for overlays (like pause menu)
+local foregroundGrid = nil
+local foregroundEnabled = false
+
 -- Initialize the ASCII grid system
 function AsciiGrid.init(windowWidth, windowHeight, cellCharWidth, cellCharHeight, gameAreaW, gameAreaH)
     charWidth = cellCharWidth
@@ -98,10 +102,11 @@ function AsciiGrid.clearArea(grid, startX, startY, endX, endY, char, color, walk
     end
 end
 
--- Render the entire ASCII grid
+-- Render the entire ASCII grid with optional foreground layer
 function AsciiGrid.draw(grid)
     grid = grid or _G.gameGrid -- Use global gameGrid if no grid provided
     
+    -- Draw main grid
     for y = 1, gridHeight do
         for x = 1, gridWidth do
             local cell = grid[y][x]
@@ -112,8 +117,28 @@ function AsciiGrid.draw(grid)
         end
     end
     
+    -- Draw foreground layer if enabled
+    if foregroundEnabled and foregroundGrid then
+        AsciiGrid.drawForeground()
+    end
+    
     -- Reset color to white
     love.graphics.setColor(1, 1, 1)
+end
+
+-- Draw only the foreground layer
+function AsciiGrid.drawForeground()
+    if foregroundEnabled and foregroundGrid then
+        for y = 1, gridHeight do
+            for x = 1, gridWidth do
+                local cell = foregroundGrid[y][x]
+                if cell and cell.char then
+                    love.graphics.setColor(cell.color)
+                    love.graphics.print(cell.char, (x-1) * charWidth, (y-1) * charHeight)
+                end
+            end
+        end
+    end
 end
 
 -- Render a specific area of the grid
@@ -163,6 +188,55 @@ function AsciiGrid.reset(grid)
             end
         end
     end
+end
+
+-- Initialize foreground layer
+function AsciiGrid.initForeground()
+    foregroundGrid = {}
+    for y = 1, gridHeight do
+        foregroundGrid[y] = {}
+        for x = 1, gridWidth do
+            foregroundGrid[y][x] = nil  -- Empty cells by default
+        end
+    end
+end
+
+-- Enable/disable foreground layer
+function AsciiGrid.setForegroundEnabled(enabled)
+    foregroundEnabled = enabled
+    if enabled and not foregroundGrid then
+        AsciiGrid.initForeground()
+    end
+end
+
+-- Clear foreground layer
+function AsciiGrid.clearForeground()
+    if foregroundGrid then
+        for y = 1, gridHeight do
+            for x = 1, gridWidth do
+                foregroundGrid[y][x] = nil
+            end
+        end
+    end
+end
+
+-- Set a cell in the foreground layer
+function AsciiGrid.setForegroundCell(x, y, char, color)
+    if not foregroundGrid then
+        AsciiGrid.initForeground()
+    end
+    
+    if x > 0 and x <= gridWidth and y > 0 and y <= gridHeight then
+        foregroundGrid[y][x] = {char = char, color = color}
+    end
+end
+
+-- Get foreground grid for direct manipulation
+function AsciiGrid.getForegroundGrid()
+    if not foregroundGrid then
+        AsciiGrid.initForeground()
+    end
+    return foregroundGrid
 end
 
 return AsciiGrid

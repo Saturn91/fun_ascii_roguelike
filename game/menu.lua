@@ -4,6 +4,7 @@ local Menu = {}
 
 -- Import required modules
 local Colors = require("Colors")
+local BackgroundMap = require("game.menu.backgroundMap")
 
 -- Menu state
 local selectedOption = 2  -- Start on "New Game"
@@ -16,22 +17,23 @@ local menuOptions = {
 -- Initialize the menu
 function Menu.init()
     selectedOption = 2  -- Start on "New Game" instead of "Continue"
+    BackgroundMap.init()
 end
 
 -- Draw the menu to the ASCII grid
-function Menu.draw(gameGrid, gridWidth, gridHeight)
-    -- Clear the grid first
-    for y = 1, gridHeight do
-        for x = 1, gridWidth do
-            if gameGrid[y] and gameGrid[y][x] then
-                gameGrid[y][x] = {char = " ", color = {0, 0, 0}, walkable = false}
-            end
-        end
+function Menu.draw(gameGrid, gridWidth, gridHeight, dt)
+    -- Update and draw background map
+    if dt then
+        BackgroundMap.update(dt)
     end
+    BackgroundMap.draw(gameGrid, gridWidth, gridHeight, 0.4)
     
     -- Calculate center positions
     local centerX = math.floor(gridWidth / 2)
     local centerY = math.floor(gridHeight / 2)
+    
+    -- Draw darker overlay behind menu text
+    BackgroundMap.drawOverlay(gameGrid, centerX, centerY, 15, 8, 0.3)
     
     -- Draw title
     local title = "ASCII ROGUELIKE"
@@ -116,6 +118,11 @@ end
 -- Get current selected option (for debugging)
 function Menu.getSelectedOption()
     return selectedOption, menuOptions[selectedOption].text
+end
+
+-- Clear background when starting new game
+function Menu.clearBackground()
+    BackgroundMap.clear()
 end
 
 return Menu

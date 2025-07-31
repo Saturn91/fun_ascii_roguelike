@@ -33,7 +33,12 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - **Arrow Keys** or **WASD**: Move player / Attack enemies (move into them)
 - **H**: Test damage (decreases health)
 - **J**: Test healing (increases health)
-- **Escape**: Quit game
+- **Escape**: Pause game (during gameplay) / Resume game (in pause menu) / Quit game (from main menu)
+
+### Pause Menu Controls
+- **Arrow Keys** or **W/S**: Navigate menu options
+- **Enter** or **Space**: Select option
+- **Escape**: Resume game
 
 ## Color Markup System
 
@@ -64,6 +69,7 @@ Welcome to the [green]ASCII Roguelike[/green]!
 - **Cell management** - Functions for setting, getting, and checking grid cells
 - **Rendering engine** - Optimized character-by-character drawing
 - **Boundary checking** - Validates coordinates and walkable areas
+- **Foreground layer system** - Supports overlays without modifying base grid
 - **Modular interface** - Clean API for grid manipulation
 
 ### Color System (`Colors.lua`)
@@ -131,6 +137,25 @@ The game features a modular UI with four main components:
 - **Turn-based mechanics** - Coordinates player and enemy actions
 - **Modular design** - Easy to extend with new controls and features
 
+#### **Menu System** (`menu.lua`, `gameState.lua`)
+- **Main menu interface** - Title screen with navigation options
+- **Game state management** - Seamless transitions between menu, gameplay, and pause
+- **Dynamic background** - Live animated world behind menu
+- **Reusable components** - Modular design for future pause/options menus
+
+#### **Pause Menu System** (`pauseMenu.lua`)
+- **In-game pause functionality** - Press Escape to pause during gameplay
+- **Non-destructive overlay** - Uses foreground layer system to preserve game state
+- **Visual darkening effect** - Game remains visible behind semi-transparent overlay
+- **Menu navigation** - Resume, New Game, Main Menu, or Quit options
+- **Perfect state preservation** - Game continues exactly where you left off
+
+#### **Background Map System** (`menu/backgroundMap.lua`)
+- **Animated world generation** - Procedural dungeons with moving enemies
+- **Configurable opacity** - Adjustable background visibility
+- **Reusable component** - Can be used in any menu (main, pause, etc.)
+- **Performance optimized** - Efficient enemy movement and rendering
+
 #### **Room System** (`room.lua`)
 - **Map generator integration** - Uses procedural generation
 - **Player placement** - Smart starting position selection
@@ -152,6 +177,11 @@ fun_ascii_roguelike/
 │   ├── player.lua        # Player creation, movement, and combat
 │   ├── enemy.lua         # Enemy creation, management, and combat
 │   ├── controls.lua      # Keyboard input and game controls
+│   ├── menu.lua          # Main menu system
+│   ├── pauseMenu.lua     # In-game pause menu system
+│   ├── gameState.lua     # Game state management (menu/playing/paused)
+│   ├── menu/
+│   │   └── backgroundMap.lua  # Animated background world for menus
 │   ├── enemy/
 │   │   └── ai.lua        # Enemy AI behaviors and pathfinding
 │   ├── ui.lua            # Main UI controller

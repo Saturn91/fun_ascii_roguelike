@@ -185,21 +185,25 @@ function Enemy.placeOnGrid(enemy, gameGrid)
 end
 
 -- Spawn enemies in random walkable locations
-function Enemy.spawnRandom(gameGrid, gridWidth, gridHeight, count, enemyType)
+function Enemy.spawnRandom(gameGrid, gridWidth, gridHeight, count, enemyType, customEnemyList)
+    local enemyList = customEnemyList or enemies  -- Use custom list or default global list
     local spawned = 0
     local attempts = 0
     local maxAttempts = 1000
     
     while spawned < count and attempts < maxAttempts do
         attempts = attempts + 1
-        local x = math.random(2, gridWidth - 1)
-        local y = math.random(3, gridHeight - 1) -- Avoid top rows (UI area)
+        local x = love.math.random(2, gridWidth - 1)
+        local y = love.math.random(3, gridHeight - 1) -- Avoid top rows (UI area)
         
         local cell = gameGrid[y][x]
         if cell and cell.walkable and cell.char == "." and not cell.isEnemy then
             local enemy = Enemy.new(x, y, enemyType)
-            Enemy.placeOnGrid(enemy, gameGrid)
-            spawned = spawned + 1
+            if enemy then
+                table.insert(enemyList, enemy)
+                Enemy.placeOnGrid(enemy, gameGrid)
+                spawned = spawned + 1
+            end
         end
     end
     
