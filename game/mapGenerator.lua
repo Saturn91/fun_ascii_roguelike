@@ -9,10 +9,12 @@ function MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, amount, min
     maxSize = maxSize or 8
     
     local rooms = {}
-    local maxAttempts = 100 -- Prevent infinite loops
+    local maxAttempts = 500 -- Increased from 100 to allow more attempts
     local attempts = 0
+    local consecutiveFailures = 0
+    local maxConsecutiveFailures = 50 -- If we fail 50 times in a row, stop trying
     
-    while #rooms < amount and attempts < maxAttempts do
+    while #rooms < amount and attempts < maxAttempts and consecutiveFailures < maxConsecutiveFailures do
         attempts = attempts + 1
         
         -- Generate random room dimensions
@@ -48,6 +50,29 @@ function MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, amount, min
         if not overlaps then
             table.insert(rooms, newRoom)
             MapGenerator.createRoom(gameGrid, newRoom)
+            consecutiveFailures = 0 -- Reset failure counter
+        else
+            consecutiveFailures = consecutiveFailures + 1
+        end
+    end
+    
+    -- Log generation statistics
+    if Logger then
+        if #rooms < amount then
+            local reason = ""
+            if attempts >= maxAttempts then
+                reason = "max attempts"
+            elseif consecutiveFailures >= maxConsecutiveFailures then
+                reason = "map full"
+            end
+            
+            Logger.log(string.format("[warning]Generated %d/%d rooms (%s)[/warning]", 
+                #rooms, amount, reason))
+            Logger.log(string.format("[info]Attempts: %d, Failures: %d[/info]", 
+                attempts, consecutiveFailures))
+        else
+            Logger.log(string.format("[success]Generated %d rooms /%d[/success]", 
+                #rooms, attempts))
         end
     end
     
@@ -200,10 +225,6 @@ function MapGenerator.connectRooms(gameGrid, rooms, gridWidth, gridHeight)
             connected[bestRoomIndex] = true
             connectedCount = connectedCount + 1
             table.insert(connections, bestConnection)
-            
-            if Logger then
-                Logger.log(string.format("[info]Connected Room %d to Room %d[/info]", bestConnection.from, bestConnection.to))
-            end
         end
     end
 end
@@ -265,10 +286,7 @@ function MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, options)
     
     -- Log generation results
     if Logger then
-        Logger.log(string.format("[info]Generated %d rooms (requested %d)[/info]", #rooms, roomCount))
-        for i, room in ipairs(rooms) do
-            Logger.log(string.format("[info]Room %d: %s[/info]", i, MapGenerator.getRoomInfo(room)))
-        end
+        Logger.log(string.format("[info]Map: %d rooms[/info]", #rooms))
     end
     
     return rooms
@@ -276,11 +294,14 @@ end
 
 -- Generate the default map layout for the game (main entry point)
 function MapGenerator.generate(gameGrid, gridWidth, gridHeight)
+    -- Generate a random number of rooms between 10-20
+    local roomCount = love.math.random(10, 20)
+    
     -- Use the map generator to create procedural rooms
     local rooms = MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, {
-        roomCount = 5,
-        minRoomSize = 5,
-        maxRoomSize = 8
+        roomCount = roomCount,
+        minRoomSize = 4,  -- Reduced min size to fit more rooms
+        maxRoomSize = 7   -- Reduced max size to fit more rooms
     })
     
     -- Store rooms for later use (e.g., pathfinding, player placement)
