@@ -6,6 +6,7 @@ local UI = {}
 local TitleSection = require("game.ui.titleSection")
 local Logger = require("game.ui.logger")
 local HealthBar = require("game.ui.healthBar")
+local Controls = require("game.ui.controls")
 
 -- UI configuration
 local UI_WIDTH_RATIO = 0.25  -- UI takes up 25% of screen width
@@ -60,12 +61,24 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         height = math.floor(UI.totalHeight * 0.6) - 2 - UI.titleArea.height - 2  -- Adjust for title space
     }
     
-    -- Info area (bottom part of UI)
+    -- Info area (player information)
+    local remainingHeight = UI.totalHeight - (UI.logArea.y + UI.logArea.height + 2)
+    local infoHeight = math.floor(remainingHeight * 0.4)  -- 40% for info
+    local controlsHeight = remainingHeight - infoHeight - 2  -- Rest for controls (minus separator)
+    
     UI.infoArea = {
         x = UI.uiArea.x + 1,
         y = UI.logArea.y + UI.logArea.height + 2,
         width = UI.uiArea.width - 2,
-        height = UI.totalHeight - (UI.logArea.y + UI.logArea.height + 2)
+        height = infoHeight
+    }
+    
+    -- Controls area (game controls)
+    UI.controlsArea = {
+        x = UI.uiArea.x + 1,
+        y = UI.infoArea.y + UI.infoArea.height + 2,
+        width = UI.uiArea.width - 2,
+        height = controlsHeight
     }
 
     return UI.gameAreaWidth, UI.gameArea.height
@@ -93,6 +106,9 @@ function UI.draw(gameGrid, player)
     
     -- Draw info panel content
     UI.drawInfoPanel(gameGrid, player)
+    
+    -- Draw controls section using Controls module
+    Controls.draw(gameGrid, UI.controlsArea)
 end
 
 -- Clear the UI area with black background (empty cells)
@@ -182,10 +198,22 @@ function UI.drawUIPanelBorder(gameGrid)
     end
     
     -- Separator between log and info areas
-    local sepY = UI.logArea.y + UI.logArea.height + 1
+    local logInfoSepY = UI.logArea.y + UI.logArea.height + 1
     for x = uiX, uiX + uiW - 1 do
-        if sepY <= #gameGrid and x <= #gameGrid[sepY] then
-            gameGrid[sepY][x] = {
+        if logInfoSepY <= #gameGrid and x <= #gameGrid[logInfoSepY] then
+            gameGrid[logInfoSepY][x] = {
+                char = BORDER_CHARS.horizontal,
+                color = {0.7, 0.7, 0.7},
+                walkable = false
+            }
+        end
+    end
+    
+    -- Separator between info and controls areas
+    local infoControlsSepY = UI.infoArea.y + UI.infoArea.height + 1
+    for x = uiX, uiX + uiW - 1 do
+        if infoControlsSepY <= #gameGrid and x <= #gameGrid[infoControlsSepY] then
+            gameGrid[infoControlsSepY][x] = {
                 char = BORDER_CHARS.horizontal,
                 color = {0.7, 0.7, 0.7},
                 walkable = false
@@ -206,7 +234,7 @@ function UI.drawInfoPanel(gameGrid, player)
         if titleY <= #gameGrid and x <= #gameGrid[titleY] then
             gameGrid[titleY][x] = {
                 char = titleText:sub(i, i),
-                color = {0.5, 1, 0.5},
+                color = {0.5, 1, 0.5},  -- Light green for info title
                 walkable = false
             }
         end
@@ -216,10 +244,9 @@ function UI.drawInfoPanel(gameGrid, player)
     local infoLines = {
         "Player: @",
         string.format("Pos: (%d,%d)", player.x, player.y),
+        string.format("HP: %d/%d", player.health, player.maxHealth),
         "",
-        "Controls:",
-        "WASD - Move",
-        "ESC - Quit"
+        "Status: Alive"
     }
     
     for i, line in ipairs(infoLines) do
@@ -230,7 +257,7 @@ function UI.drawInfoPanel(gameGrid, player)
                 if y <= #gameGrid and x <= #gameGrid[y] then
                     gameGrid[y][x] = {
                         char = line:sub(j, j),
-                        color = {0.8, 0.8, 1},
+                        color = {0.8, 0.8, 1},  -- Light blue for info text
                         walkable = false
                     }
                 end
