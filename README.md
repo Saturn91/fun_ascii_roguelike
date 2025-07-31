@@ -1,6 +1,6 @@
 # ASCII Roguelike in Love2D
 
-A classic ASCII-based roguelike game built with the Love2D game engine. Features procedural room generation, modular architecture, colored text markup system, health management, enemy AI, combat mechanics, and comprehensive ASCII-based UI.
+A classic ASCII-based roguelike game built with the Love2D game engine. Features procedural room generation, modular architecture, colored text markup system, health management, enemy AI, combat mechanics, comprehensive ASCII-based UI, and a professional pause menu system.
 
 ## Features
 
@@ -9,11 +9,13 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - ✅ **Health Management** - Visual health bar with damage/healing mechanics
 - ✅ **Enemy AI System** - Multiple enemy types with different behaviors
 - ✅ **Combat Mechanics** - Turn-based combat with damage and health systems
+- ✅ **Pause Menu System** - In-game pause with semi-transparent overlay
 - ✅ **Modular Architecture** - Clean, organized code structure
 - ✅ **ASCII-based UI** - Dedicated panels for logging, controls, and status
 - ✅ **Room Generation** - Procedural rooms with corridors
 - ✅ **Player Movement** - Grid-based movement with collision detection
 - ✅ **Real-time Logging** - Timestamped game events with color coding
+- ✅ **Game State Management** - Seamless transitions between menu, gameplay, and pause
 
 ## Installation & Setup
 
@@ -35,10 +37,21 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - **J**: Test healing (increases health)
 - **Escape**: Pause game (during gameplay) / Resume game (in pause menu) / Quit game (from main menu)
 
+### Main Menu Controls
+- **Arrow Keys** or **W/S**: Navigate menu options
+- **Enter** or **Space**: Select option
+- **Escape**: Quit game
+
 ### Pause Menu Controls
 - **Arrow Keys** or **W/S**: Navigate menu options
 - **Enter** or **Space**: Select option
 - **Escape**: Resume game
+
+### Pause Menu Options
+- **Resume**: Continue exactly where you left off
+- **New Game**: Start a fresh game session
+- **Main Menu**: Return to the main menu
+- **Close**: Quit the application
 
 ## Color Markup System
 
@@ -69,7 +82,7 @@ Welcome to the [green]ASCII Roguelike[/green]!
 - **Cell management** - Functions for setting, getting, and checking grid cells
 - **Rendering engine** - Optimized character-by-character drawing
 - **Boundary checking** - Validates coordinates and walkable areas
-- **Foreground layer system** - Supports overlays without modifying base grid
+- **Foreground layer system** - Supports overlays without modifying base grid (available for future features)
 - **Modular interface** - Clean API for grid manipulation
 
 ### Color System (`Colors.lua`)
@@ -145,10 +158,11 @@ The game features a modular UI with four main components:
 
 #### **Pause Menu System** (`pauseMenu.lua`)
 - **In-game pause functionality** - Press Escape to pause during gameplay
-- **Non-destructive overlay** - Uses foreground layer system to preserve game state
-- **Visual darkening effect** - Game remains visible behind semi-transparent overlay
+- **Semi-transparent overlay** - Uses Love2D graphics for true transparency effect
+- **Game state preservation** - Current game remains visible behind overlay
 - **Menu navigation** - Resume, New Game, Main Menu, or Quit options
-- **Perfect state preservation** - Game continues exactly where you left off
+- **Non-destructive pausing** - Game continues exactly where you left off
+- **Professional visual design** - Clean overlay with proper opacity and text rendering
 
 #### **Background Map System** (`menu/backgroundMap.lua`)
 - **Animated world generation** - Procedural dungeons with moving enemies
@@ -197,33 +211,42 @@ fun_ascii_roguelike/
 
 ## Development Features
 
-### Modular Design
+#### **Modular Design**
 - **Separation of concerns** - Each module handles specific functionality
 - **Easy maintenance** - Add new features without affecting existing code
 - **Reusable components** - UI modules can be easily extended
+- **Clean architecture** - Logical organization across multiple directories
 
-### Color-Coded Feedback
+#### **Color-Coded Feedback**
 - **Damage events** appear in red with damage markup
 - **Healing events** appear in green with health markup
 - **System messages** use appropriate warning/info colors
 - **Enhanced readability** through consistent color usage
 
-### Health System
+#### **Health System**
 - **Visual health bar** with Unicode block characters
 - **Zero-padded display** for consistent formatting
 - **Color-coded status** indicating health condition
 - **Real-time updates** as health changes
 
-### Combat System
+#### **Combat System**
 - **Turn-based mechanics** - Player moves, then enemies act
 - **Bump combat** - Attack by moving into enemies
 - **Multiple enemy types** - Each with unique stats and behaviors
 - **Victory/defeat conditions** - Clear objectives and game over states
 
+#### **Game State Management**
+- **Three distinct states** - Menu, Playing, and Paused
+- **Seamless transitions** - Smooth state changes without data loss
+- **State preservation** - Perfect game state maintenance during pause
+- **Clean separation** - Each state has dedicated rendering and input handling
+
 ## Future Enhancements
 
 - [x] ~~Enemy entities with AI behavior~~ ✅ **Implemented!**
 - [x] ~~Combat mechanics with weapons/spells~~ ✅ **Basic combat implemented!**
+- [x] ~~Pause menu system~~ ✅ **Professional pause menu implemented!**
+- [x] ~~Game state management~~ ✅ **Complete state system implemented!**
 - [ ] Item and inventory system
 - [ ] Extended procedural dungeon generation
 - [ ] Advanced AI behaviors (group tactics, special abilities)
@@ -232,6 +255,8 @@ fun_ascii_roguelike/
 - [ ] Save/load game functionality
 - [ ] Sound effects and music
 - [ ] Additional color themes
+- [ ] Settings/options menu
+- [ ] Game over screen with statistics
 
 ## Technical Notes
 
@@ -249,6 +274,19 @@ The color markup system is optimized for:
 - **Memory-conscious** color object reuse
 - **Scalable markup** supporting nested and complex formatting
 
+### Pause Menu Architecture
+The pause menu system uses a **hybrid rendering approach**:
+- **Love2D graphics overlay** - Semi-transparent rectangle for darkening effect
+- **Direct text rendering** - Menu text drawn with Love2D's print functions
+- **Non-destructive design** - Original game grid remains completely unmodified
+- **True transparency** - Game state clearly visible behind overlay
+
+### Performance Optimizations
+- **Efficient grid rendering** - Only draws non-space characters
+- **Smart enemy AI** - Optimized pathfinding and behavior calculations
+- **Minimal memory usage** - Proper cleanup and resource management
+- **Foreground layer system** - Available for future overlay features
+
 ### Love2D Configuration
 - **Window title**: "ASCII Roguelike"
 - **Resizable window**: Enabled for flexible gameplay
@@ -263,5 +301,16 @@ This is a learning project demonstrating:
 - ASCII art and text-based game design
 - Color markup system implementation
 - Integrated asset management
+- Game state management systems
+- Semi-transparent overlay techniques
+- Professional pause menu implementation
+
+### Project Highlights
+- **Complete roguelike experience** with procedural generation
+- **Professional UI systems** with colored text and visual feedback
+- **Advanced enemy AI** with multiple behavior patterns
+- **Clean modular architecture** enabling easy feature additions
+- **Modern pause menu** with transparency effects
+- **Comprehensive documentation** for learning and reference
 
 Feel free to explore the code and adapt it for your own ASCII roguelike projects!
