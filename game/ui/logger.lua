@@ -21,6 +21,10 @@ function Logger.log(message)
     end
 end
 
+function Logger.error(message)
+    Logger.log("[red]-->err:" .. message .. "[/red]")
+end
+
 -- Wrap colored text segments to fit within specified width
 function Logger.wrapColoredText(segments, maxWidth)
     local lines = {}
