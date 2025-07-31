@@ -125,6 +125,12 @@ The game features a modular UI with four main components:
 - **Smart placement** - Automatic room positioning with buffer zones
 - **Extensible design** - Ready for corridor generation and advanced features
 
+#### **Controls System** (`controls.lua`)
+- **Centralized input handling** - All keyboard controls in one module
+- **Game state management** - Handles victory/defeat conditions
+- **Turn-based mechanics** - Coordinates player and enemy actions
+- **Modular design** - Easy to extend with new controls and features
+
 #### **Room System** (`room.lua`)
 - **Map generator integration** - Uses procedural generation
 - **Player placement** - Smart starting position selection
@@ -145,6 +151,7 @@ fun_ascii_roguelike/
 │   ├── mapGenerator.lua  # Procedural dungeon generation
 │   ├── player.lua        # Player creation, movement, and combat
 │   ├── enemy.lua         # Enemy creation, management, and combat
+│   ├── controls.lua      # Keyboard input and game controls
 │   ├── enemy/
 │   │   └── ai.lua        # Enemy AI behaviors and pathfinding
 │   ├── ui.lua            # Main UI controller
