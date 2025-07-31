@@ -25,14 +25,14 @@ end
 -- Damage the player (reduce health)
 function Player.takeDamage(player, damage)
     player.health = math.max(0, player.health - damage)
-    Logger.log(string.format("Player takes [damage]%d damage[/damage]! Health: [health]%d[/health]/[health]%d[/health]", 
+    Logger.log(string.format("[gold]"..player.char.."[/gold] takes [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
         damage, player.health, player.maxHealth))
 end
 
 -- Heal the player (restore health)
 function Player.heal(player, amount)
     player.health = math.min(player.maxHealth, player.health + amount)
-    Logger.log(string.format("Player heals [heal]%d health[/heal]! Health: [health]%d[/health]/[health]%d[/health]", 
+    Logger.log(string.format("[gold]"..player.char.."[/gold] heals [heal]%d health[/heal]! ([health]%d[/health]/[health]%d[/health])", 
         amount, player.health, player.maxHealth))
 end
 

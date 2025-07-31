@@ -17,8 +17,9 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 
 1. **Install Love2D** from [love2d.org](https://love2d.org/)
 2. **Run the game**:
-   - Drag the game folder onto the Love2D executable
-   - Or run from command line: `love .` (in the game directory)
+   - **Windows**: Run `"C:\Program Files\LOVE\love.exe" .` from the game directory
+   - **Alternative**: Drag the game folder onto the Love2D executable
+   - **General**: Run `love .` if Love2D is in your system PATH
 
 **No additional setup required!** The game comes with an integrated DejaVu Sans Mono font system.
 
@@ -52,6 +53,13 @@ Welcome to the [green]ASCII Roguelike[/green]!
 - **Integrated DejaVu Sans Mono** - Bundled with game files
 - **Automatic sizing** - Character dimensions calculated automatically
 - **No external dependencies** - Works out of the box
+
+### ASCII Grid System (`asciiGrid.lua`)
+- **Grid initialization** - Handles window-to-grid dimension calculation
+- **Cell management** - Functions for setting, getting, and checking grid cells
+- **Rendering engine** - Optimized character-by-character drawing
+- **Boundary checking** - Validates coordinates and walkable areas
+- **Modular interface** - Clean API for grid manipulation
 
 ### Color System (`Colors.lua`)
 - **20+ predefined colors** - Including game-specific colors
@@ -102,6 +110,7 @@ fun_ascii_roguelike/
 ├── main.lua              # Main game loop and Love2D callbacks
 ├── conf.lua              # Love2D configuration settings
 ├── fonts.lua             # Integrated font management system
+├── asciiGrid.lua         # ASCII grid rendering and management
 ├── Colors.lua            # Color palette and markup parser
 ├── game/
 │   ├── room.lua          # Room generation and layout functions

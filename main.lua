@@ -6,6 +6,7 @@ Logger = require("game.ui.logger")
 
 -- Import game modules
 local Fonts = require("fonts")
+local AsciiGrid = require("asciiGrid")
 local Room = require("game.room")
 local Player = require("game.player")
 local UI = require("game.ui")
@@ -23,29 +24,14 @@ function love.load()
     local windowHeight = 768
     love.window.setMode(windowWidth, windowHeight)
     
-    gridWidth = math.floor(windowWidth / charWidth)
-    gridHeight = math.floor(windowHeight / charHeight)
+    -- Initialize ASCII grid system
+    gameGrid, gridWidth, gridHeight = AsciiGrid.init(windowWidth, windowHeight, charWidth, charHeight)
     
     -- Initialize UI system and get adjusted game area dimensions
     local gameAreaWidth, gameAreaHeight = UI.init(gridWidth, gridHeight, charWidth, charHeight)
     
     -- Set up UI reference for Player module
     Player.setUI(UI)
-    
-    -- Initialize game state with solid walls everywhere
-    gameGrid = {}
-    for y = 1, gridHeight do
-        gameGrid[y] = {}
-        for x = 1, gridWidth do
-            if y == 1 then
-                -- Top row is reserved for health bar - make it empty/black
-                gameGrid[y][x] = {char = " ", color = {0, 0, 0}, walkable = false}
-            else
-                -- All other areas start as walls
-                gameGrid[y][x] = {char = "#", color = {0.4, 0.4, 0.4}, walkable = false} -- Dark gray walls
-            end
-        end
-    end
     
     -- Generate the room layout using the Room module (only in game area)
     Room.generateDefaultLayout(gameGrid, gameAreaWidth, gameAreaHeight)
@@ -70,19 +56,8 @@ function love.draw()
     -- Draw the UI (this modifies the gameGrid to include UI elements)
     UI.draw(gameGrid, player)
     
-    -- Draw the ASCII grid (including game area and UI)
-    for y = 1, gridHeight do
-        for x = 1, gridWidth do
-            local cell = gameGrid[y][x]
-            if cell and cell.char and cell.char ~= " " then  -- Don't render space characters
-                love.graphics.setColor(cell.color)
-                love.graphics.print(cell.char, (x-1) * charWidth, (y-1) * charHeight)
-            end
-        end
-    end
-    
-    -- Reset color
-    love.graphics.setColor(1, 1, 1)
+    -- Draw the ASCII grid using the AsciiGrid module
+    AsciiGrid.draw()
 end
 
 function love.keypressed(key)
