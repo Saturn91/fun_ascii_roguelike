@@ -13,6 +13,8 @@ local Enemy = require("game.enemy")
 local UI = require("game.ui")
 local MapGenerator = require("game.mapGenerator")
 local Controls = require("game.controls")
+local Menu = require("game.menu")
+local GameState = require("game.gameState")
 
 function love.load()
     -- Set up the game window
@@ -31,11 +33,60 @@ function love.load()
     local tempGridWidth = math.floor(windowWidth / charWidth)
     local tempGridHeight = math.floor(windowHeight / charHeight)
     
-    -- Initialize UI system and get adjusted game area dimensions
-    local gameAreaWidth, gameAreaHeight = UI.init(tempGridWidth, tempGridHeight, charWidth, charHeight)
+    -- Initialize ASCII grid system (full screen for menu)
+    gameGrid, gridWidth, gridHeight = AsciiGrid.init(windowWidth, windowHeight, charWidth, charHeight, tempGridWidth, tempGridHeight)
     
-    -- Initialize ASCII grid system with game area boundaries
-    gameGrid, gridWidth, gridHeight = AsciiGrid.init(windowWidth, windowHeight, charWidth, charHeight, gameAreaWidth, gameAreaHeight)
+    -- Initialize game state and menu
+    GameState.init()
+    Menu.init()
+    
+    -- Game variables (will be initialized when starting new game)
+    player = nil
+    gameAreaWidth = nil
+    gameAreaHeight = nil
+end
+
+function love.update(dt)
+    -- Game update logic will go here
+end
+
+function love.draw()
+    -- Clear screen with black background
+    love.graphics.clear(0, 0, 0, 1)
+    
+    if GameState.isMenu() then
+        -- Draw menu
+        Menu.draw(gameGrid, gridWidth, gridHeight)
+    elseif GameState.isPlaying() then
+        -- Draw the UI (this modifies the gameGrid to include UI elements)
+        UI.draw(gameGrid, player)
+    end
+    
+    -- Draw the ASCII grid using the AsciiGrid module
+    AsciiGrid.draw()
+end
+
+function love.keypressed(key)
+    if GameState.isMenu() then
+        -- Handle menu input
+        local result = Menu.handleInput(key)
+        if result == "new_game" then
+            startNewGame()
+        elseif result == "quit" then
+            love.event.quit()
+        end
+    elseif GameState.isPlaying() then
+        -- Delegate all keyboard handling to the Controls module
+        Controls.handleKeypress(key, player, gameGrid)
+    end
+end
+
+function startNewGame()
+    -- Initialize UI system and get adjusted game area dimensions
+    gameAreaWidth, gameAreaHeight = UI.init(gridWidth, gridHeight, charWidth, charHeight)
+    
+    -- Reinitialize ASCII grid system with game area boundaries
+    gameGrid, gridWidth, gridHeight = AsciiGrid.init(love.graphics.getWidth(), love.graphics.getHeight(), charWidth, charHeight, gameAreaWidth, gameAreaHeight)
     
     -- Set up UI reference for Player and Enemy modules
     Player.setUI(UI)
@@ -57,24 +108,7 @@ function love.load()
     -- Add welcome messages with color markup
     Logger.log("[gold]Welcome to ASCII Roguelike![/gold]")
     Logger.log("[warning]Enemies have appeared![/warning]")
-end
-
-function love.update(dt)
-    -- Game update logic will go here
-end
-
-function love.draw()
-    -- Clear screen with black background
-    love.graphics.clear(0, 0, 0, 1)
     
-    -- Draw the UI (this modifies the gameGrid to include UI elements)
-    UI.draw(gameGrid, player)
-    
-    -- Draw the ASCII grid using the AsciiGrid module
-    AsciiGrid.draw()
-end
-
-function love.keypressed(key)
-    -- Delegate all keyboard handling to the Controls module
-    Controls.handleKeypress(key, player, gameGrid)
+    -- Switch to playing state
+    GameState.setState(GameState.STATES.PLAYING)
 end

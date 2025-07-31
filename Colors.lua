@@ -14,6 +14,8 @@ Colors.palette = {
     white = {1, 1, 1},
     black = {0, 0, 0},
     gray = {0.5, 0.5, 0.5},
+    darkgray = {0.3, 0.3, 0.3},
+    lightgray = {0.7, 0.7, 0.7},
     
     -- Game-specific colors
     health = {0, 0.8, 0},      -- Green for health
