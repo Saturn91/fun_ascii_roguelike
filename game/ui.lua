@@ -29,7 +29,7 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
     UI.charWidth = charWidth
     UI.charHeight = charHeight
     
-    -- UI sections (adjusted for health bar at top)
+    -- UI sections (health bar over game area, UI extends to top)
     UI.gameArea = {
         x = 1,
         y = 2,  -- Start one row down to make room for health bar
@@ -39,15 +39,15 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
     
     UI.uiArea = {
         x = UI.gameAreaWidth + 1,
-        y = 2,  -- Start one row down to make room for health bar
+        y = 1,  -- UI section extends to the very top
         width = UI.uiAreaWidth,
-        height = UI.totalHeight - 1  -- Reduce height by 1 for health bar
+        height = UI.totalHeight  -- Full height for UI
     }
     
     -- Title area (top section of UI)
     UI.titleArea = {
         x = UI.uiArea.x + 1,
-        y = UI.uiArea.y + 1,
+        y = UI.uiArea.y,  -- Start at very top of UI area
         width = UI.uiArea.width - 2,
         height = 8  -- Space for title, version, and author
     }
@@ -73,8 +73,8 @@ end
 
 -- Draw the entire UI
 function UI.draw(gameGrid, player)
-    -- Draw health bar at the top of the screen first
-    HealthBar.draw(gameGrid, player, UI.totalWidth)
+    -- Draw health bar centered over game area
+    HealthBar.draw(gameGrid, player, UI.gameAreaWidth)
     
     -- Clear UI area with empty/black background
     UI.clearUIArea(gameGrid)

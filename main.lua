@@ -50,7 +50,13 @@ function love.load()
     for y = 1, gridHeight do
         gameGrid[y] = {}
         for x = 1, gridWidth do
-            gameGrid[y][x] = {char = "#", color = {0.4, 0.4, 0.4}, walkable = false} -- Dark gray walls
+            if y == 1 then
+                -- Top row is reserved for health bar - make it empty/black
+                gameGrid[y][x] = {char = " ", color = {0, 0, 0}, walkable = false}
+            else
+                -- All other areas start as walls
+                gameGrid[y][x] = {char = "#", color = {0.4, 0.4, 0.4}, walkable = false} -- Dark gray walls
+            end
         end
     end
     
