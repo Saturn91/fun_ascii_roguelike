@@ -5,6 +5,7 @@ local UI = {}
 -- Import UI sub-modules
 local TitleSection = require("game.ui.titleSection")
 local Logger = require("game.ui.logger")
+local HealthBar = require("game.ui.healthBar")
 
 -- UI configuration
 local UI_WIDTH_RATIO = 0.25  -- UI takes up 25% of screen width
@@ -28,19 +29,19 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
     UI.charWidth = charWidth
     UI.charHeight = charHeight
     
-    -- UI sections
+    -- UI sections (adjusted for health bar at top)
     UI.gameArea = {
         x = 1,
-        y = 1,
+        y = 2,  -- Start one row down to make room for health bar
         width = UI.gameAreaWidth,
-        height = UI.totalHeight
+        height = UI.totalHeight - 1  -- Reduce height by 1 for health bar
     }
     
     UI.uiArea = {
         x = UI.gameAreaWidth + 1,
-        y = 1,
+        y = 2,  -- Start one row down to make room for health bar
         width = UI.uiAreaWidth,
-        height = UI.totalHeight
+        height = UI.totalHeight - 1  -- Reduce height by 1 for health bar
     }
     
     -- Title area (top section of UI)
@@ -67,11 +68,14 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         height = UI.totalHeight - (UI.logArea.y + UI.logArea.height + 2)
     }
 
-    return UI.gameAreaWidth, UI.totalHeight
+    return UI.gameAreaWidth, UI.gameArea.height
 end
 
 -- Draw the entire UI
 function UI.draw(gameGrid, player)
+    -- Draw health bar at the top of the screen first
+    HealthBar.draw(gameGrid, player, UI.totalWidth)
+    
     -- Clear UI area with empty/black background
     UI.clearUIArea(gameGrid)
     
@@ -237,7 +241,7 @@ end
 
 -- Get game area dimensions for the main game logic
 function UI.getGameAreaDimensions()
-    return UI.gameAreaWidth, UI.totalHeight
+    return UI.gameAreaWidth, UI.gameArea.height
 end
 
 -- Check if a coordinate is in the game area

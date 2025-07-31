@@ -10,14 +10,33 @@ function Player.setUI(uiModule)
 end
 
 -- Create a new player at the specified position
-function Player.new(x, y)
+function Player.new(x, y, health)
     return {
         x = x,
         y = y,
         char = "@",
-        color = {1, 1, 0}, -- Yellow
+        color = {1, 1, 0}, -- Yellow,
+        health = health,
+        maxHealth = health,
         walkable = true
     }
+end
+
+-- Damage the player (reduce health)
+function Player.takeDamage(player, damage)
+    player.health = math.max(0, player.health - damage)
+    Logger.log(string.format("Player takes %d damage! Health: %d/%d", damage, player.health, player.maxHealth))
+end
+
+-- Heal the player (restore health)
+function Player.heal(player, amount)
+    player.health = math.min(player.maxHealth, player.health + amount)
+    Logger.log(string.format("Player heals %d health! Health: %d/%d", amount, player.health, player.maxHealth))
+end
+
+-- Check if player is alive
+function Player.isAlive(player)
+    return player.health > 0
 end
 
 -- Handle player movement input and update position

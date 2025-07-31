@@ -4,6 +4,7 @@ local TitleSection = {}
 -- Draw the title section content
 function TitleSection.draw(gameGrid, titleArea)
     local titleLines = {
+        "",
         "ASCII ROGUELIKE",
         "---------------",
         "Version: 1.0.0",
@@ -13,6 +14,7 @@ function TitleSection.draw(gameGrid, titleArea)
     }
     
     local colors = {
+        {0.9, 0.9, 0.9},  -- White for empty line
         {1, 0.8, 0.2},    -- Gold for title
         {0.7, 0.7, 0.7},  -- Gray for underline
         {0.6, 0.8, 1},    -- Light blue for version

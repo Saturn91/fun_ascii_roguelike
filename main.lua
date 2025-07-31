@@ -63,7 +63,7 @@ function love.load()
     
     -- Create and position the player using the Player module
     local startX, startY = Room.findPlayerStartPosition(gameGrid, gameAreaWidth, gameAreaHeight)
-    player = Player.new(startX, startY)
+    player = Player.new(startX, startY, 10)
     Player.placeOnGrid(player, gameGrid)
 end
 
@@ -97,6 +97,15 @@ function love.keypressed(key)
     -- Handle system keys
     if key == "escape" then
         love.event.quit()
+        return
+    end
+    
+    -- Test keys for health bar (temporary)
+    if key == "h" then
+        Player.heal(player, 1)  -- Heal 1 HP with 'h' key
+        return
+    elseif key == "j" then
+        Player.takeDamage(player, 1)  -- Take 1 damage with 'j' key
         return
     end
     
