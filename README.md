@@ -1,6 +1,6 @@
 # ASCII Roguelike in Love2D
 
-A classic ASCII-based roguelike game built with the Love2D game engine. Features procedural room generation, modular architecture, colored text markup system, health management, and comprehensive ASCII-based UI.
+A classic ASCII-based roguelike game built with the Love2D game engine. Features procedural room generation, modular architecture, colored text markup system, health management, enemy AI, combat mechanics, and comprehensive ASCII-based UI.
 
 ## Features
 
@@ -155,6 +155,12 @@ fun_ascii_roguelike/
 - **Zero-padded display** for consistent formatting
 - **Color-coded status** indicating health condition
 - **Real-time updates** as health changes
+
+### Combat System
+- **Turn-based mechanics** - Player moves, then enemies act
+- **Bump combat** - Attack by moving into enemies
+- **Multiple enemy types** - Each with unique stats and behaviors
+- **Victory/defeat conditions** - Clear objectives and game over states
 
 ## Future Enhancements
 
