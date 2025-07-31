@@ -9,6 +9,7 @@ local Fonts = require("fonts")
 local AsciiGrid = require("asciiGrid")
 local Room = require("game.room")
 local Player = require("game.player")
+local Enemy = require("game.enemy")
 local UI = require("game.ui")
 
 function love.load()
@@ -30,8 +31,9 @@ function love.load()
     -- Initialize UI system and get adjusted game area dimensions
     local gameAreaWidth, gameAreaHeight = UI.init(gridWidth, gridHeight, charWidth, charHeight)
     
-    -- Set up UI reference for Player module
+    -- Set up UI reference for Player and Enemy modules
     Player.setUI(UI)
+    Enemy.setUI(UI)
     
     -- Generate the room layout using the Room module (only in game area)
     Room.generateDefaultLayout(gameGrid, gameAreaWidth, gameAreaHeight)
@@ -41,8 +43,14 @@ function love.load()
     player = Player.new(startX, startY, 10)
     Player.placeOnGrid(player, gameGrid)
     
+    -- Spawn some enemies
+    Enemy.spawnRandom(gameGrid, gameAreaWidth, gameAreaHeight, 3, "goblin")
+    Enemy.spawnRandom(gameGrid, gameAreaWidth, gameAreaHeight, 2, "orc")
+    Enemy.spawnRandom(gameGrid, gameAreaWidth, gameAreaHeight, 2, "skeleton")
+    
     -- Add welcome messages with color markup
     Logger.log("[gold]Welcome to ASCII Roguelike![/gold]")
+    Logger.log("[warning]Enemies have appeared![/warning]")
 end
 
 function love.update(dt)
@@ -78,5 +86,22 @@ function love.keypressed(key)
     
     -- Handle player movement using Player module (constrained to game area)
     local gameAreaWidth, gameAreaHeight = UI.getGameAreaDimensions()
-    Player.handleMovement(player, key, gameGrid, gameAreaWidth, gameAreaHeight)
+    local playerMoved = Player.handleMovement(player, key, gameGrid, gameAreaWidth, gameAreaHeight)
+    
+    -- If player moved or took an action, update enemies
+    if playerMoved then
+        Enemy.updateAll(player, gameGrid, gameAreaWidth, gameAreaHeight)
+        
+        -- Check if player died
+        if not Player.isAlive(player) then
+            Logger.log("[error]Game Over! You have died![/error]")
+            Logger.log("[info]Press Escape to quit[/info]")
+        end
+        
+        -- Check victory condition
+        if Enemy.getTotalCount() == 0 then
+            Logger.log("[success]Victory! All enemies defeated![/success]")
+            Logger.log("[info]Press Escape to quit[/info]")
+        end
+    end
 end

@@ -65,10 +65,16 @@ end
 
 -- Move player to new position if valid
 function Player.moveTo(player, newX, newY, gameGrid, gridWidth, gridHeight)
-    -- Check bounds and if the target tile is walkable
+    -- Check bounds
     if newX >= 1 and newX <= gridWidth and newY >= 1 and newY <= gridHeight then
         local targetTile = gameGrid[newY][newX]
-        if targetTile and targetTile.walkable then
+        
+        -- Check if there's an enemy at the target position
+        if targetTile and targetTile.isEnemy and targetTile.enemy then
+            -- Attack the enemy instead of moving
+            Player.attackEnemy(player, targetTile.enemy, gameGrid)
+            return true -- Action taken (attack)
+        elseif targetTile and targetTile.walkable then
             -- Clear old position (restore the floor)
             gameGrid[player.y][player.x] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
             
@@ -95,6 +101,15 @@ function Player.placeOnGrid(player, gameGrid)
         color = player.color, 
         walkable = true
     }
+end
+
+-- Player attacks an enemy
+function Player.attackEnemy(player, enemy, gameGrid)
+    local damage = 2 -- Player base damage
+    
+    -- Import Enemy module locally to avoid circular dependency
+    local Enemy = require("game.enemy")
+    Enemy.takeDamage(enemy, damage, gameGrid)
 end
 
 -- Get player's current position

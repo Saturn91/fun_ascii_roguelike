@@ -7,6 +7,8 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - ✅ **Integrated Font System** - No external font installation needed
 - ✅ **Color Markup System** - Rich colored text with `[color]text[/color]` syntax
 - ✅ **Health Management** - Visual health bar with damage/healing mechanics
+- ✅ **Enemy AI System** - Multiple enemy types with different behaviors
+- ✅ **Combat Mechanics** - Turn-based combat with damage and health systems
 - ✅ **Modular Architecture** - Clean, organized code structure
 - ✅ **ASCII-based UI** - Dedicated panels for logging, controls, and status
 - ✅ **Room Generation** - Procedural rooms with corridors
@@ -25,7 +27,7 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 
 ## Controls
 
-- **Arrow Keys** or **WASD**: Move player
+- **Arrow Keys** or **WASD**: Move player / Attack enemies (move into them)
 - **H**: Test damage (decreases health)
 - **J**: Test healing (increases health)
 - **Escape**: Quit game
@@ -94,9 +96,17 @@ The game features a modular UI with four main components:
 
 #### **Player System** (`player.lua`)
 - **Grid-based movement** with collision detection
+- **Combat mechanics** - Attack enemies by moving into them
 - **Health management** with damage/healing mechanics
 - **Colored log messages** for all player actions
 - **Boundary checking** to keep player in game area
+
+#### **Enemy System** (`enemy.lua`)
+- **Multiple enemy types** - Goblins, Orcs, and Skeletons
+- **AI behaviors** - Chase player when in range, random movement
+- **Combat system** - Damage players when adjacent
+- **Different stats** - Health, damage, movement patterns per type
+- **Smart pathfinding** - Move towards player when detected
 
 #### **Room Generation** (`room.lua`)
 - **Procedural room layout** with ASCII walls
@@ -114,7 +124,8 @@ fun_ascii_roguelike/
 ├── Colors.lua            # Color palette and markup parser
 ├── game/
 │   ├── room.lua          # Room generation and layout functions
-│   ├── player.lua        # Player creation, movement, and health
+│   ├── player.lua        # Player creation, movement, and combat
+│   ├── enemy.lua         # Enemy AI, types, and behavior systems
 │   ├── ui.lua            # Main UI controller
 │   └── ui/
 │       ├── titleSection.lua   # Game title and info
@@ -147,11 +158,13 @@ fun_ascii_roguelike/
 
 ## Future Enhancements
 
-- [ ] Enemy entities with AI behavior
+- [x] ~~Enemy entities with AI behavior~~ ✅ **Implemented!**
+- [x] ~~Combat mechanics with weapons/spells~~ ✅ **Basic combat implemented!**
 - [ ] Item and inventory system
 - [ ] Extended procedural dungeon generation
-- [ ] Combat mechanics with weapons/spells
+- [ ] Advanced AI behaviors (group tactics, special abilities)
 - [ ] Line of sight and fog of war
+- [ ] Experience points and leveling system
 - [ ] Save/load game functionality
 - [ ] Sound effects and music
 - [ ] Additional color themes
