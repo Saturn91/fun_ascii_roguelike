@@ -77,6 +77,36 @@ function Menu.draw(gameGrid, gridWidth, gridHeight, dt)
             end
         end
     end
+    
+    -- Draw controls at the bottom
+    local controlsText = "Arrow Keys/W,S: Navigate  Enter/Space: Select  Escape: Quit"
+    local controlsY = gridHeight - 2
+    local controlsStartX = centerX - math.floor(string.len(controlsText) / 2)
+    
+    if controlsY > 0 and controlsStartX > 0 then
+        for i = 1, string.len(controlsText) do
+            local char = string.sub(controlsText, i, i)
+            local x = controlsStartX + i - 1
+            if x > 0 and x <= gridWidth and gameGrid[controlsY] and gameGrid[controlsY][x] then
+                gameGrid[controlsY][x] = {char = char, color = Colors.palette.lightgray, walkable = false}
+            end
+        end
+    end
+    
+    -- Draw "made by saturn91.dev" credit on the right side
+    local creditText = "made by saturn91.dev"
+    local creditY = gridHeight - 1
+    local creditX = gridWidth - string.len(creditText) - 1
+    
+    if creditY > 0 and creditX > 0 then
+        for i = 1, string.len(creditText) do
+            local char = string.sub(creditText, i, i)
+            local x = creditX + i - 1
+            if x > 0 and x <= gridWidth and gameGrid[creditY] and gameGrid[creditY][x] then
+                gameGrid[creditY][x] = {char = char, color = Colors.palette.yellow, walkable = false}
+            end
+        end
+    end
 end
 
 -- Handle menu navigation
