@@ -13,10 +13,10 @@ local Enemy = require("game.enemy")
 local UI = require("game.ui")
 local MapGenerator = require("game.mapGenerator")
 local Controls = require("game.controls")
-local Menu = require("game.menu")
+local Menu = require("menu.menu")
 local GameState = require("game.gameState")
-local PauseMenu = require("game.pauseMenu")
-local GameOverScreen = require("game.gameOverScreen")
+local PauseMenu = require("menu.pauseMenu")
+local GameOverScreen = require("menu.gameOverScreen")
 
 function love.load()
     -- Set up the game window

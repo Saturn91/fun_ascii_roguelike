@@ -167,13 +167,13 @@ The game features a modular UI with four main components:
 - **Turn-based mechanics** - Coordinates player and enemy actions
 - **Modular design** - Easy to extend with new controls and features
 
-#### **Menu System** (`menu.lua`, `gameState.lua`)
+#### **Menu System** (`menu/menu.lua`, `game/gameState.lua`)
 - **Main menu interface** - Title screen with navigation options
 - **Game state management** - Seamless transitions between menu, gameplay, and pause
 - **Dynamic background** - Live animated world behind menu
 - **Reusable components** - Modular design for future pause/options menus
 
-#### **Pause Menu System** (`pauseMenu.lua`)
+#### **Pause Menu System** (`menu/pauseMenu.lua`)
 - **In-game pause functionality** - Press Escape to pause during gameplay
 - **Semi-transparent overlay** - Uses Love2D graphics for true transparency effect
 - **Game state preservation** - Current game remains visible behind overlay
@@ -181,7 +181,7 @@ The game features a modular UI with four main components:
 - **Non-destructive pausing** - Game continues exactly where you left off
 - **Professional visual design** - Clean overlay with proper opacity and text rendering
 
-#### **Game Over System** (`gameOverScreen.lua`)
+#### **Game Over System** (`menu/gameOverScreen.lua`)
 - **Death detection** - Automatically triggers when player health reaches zero
 - **Game statistics display** - Shows enemies killed, time survived, and cause of death
 - **Semi-transparent overlay** - Dark red tint for dramatic effect
@@ -210,18 +210,18 @@ fun_ascii_roguelike/
 ├── fonts.lua             # Integrated font management system
 ├── asciiGrid.lua         # ASCII grid rendering and management
 ├── Colors.lua            # Color palette and markup parser
+├── menu/                 # Menu system components
+│   ├── menu.lua          # Main menu system
+│   ├── pauseMenu.lua     # In-game pause menu system
+│   ├── gameOverScreen.lua # Game over screen with statistics
+│   └── backgroundMap.lua # Animated background world for menus
 ├── game/
 │   ├── room.lua          # Room system and player placement
 │   ├── mapGenerator.lua  # Procedural dungeon generation
 │   ├── player.lua        # Player creation, movement, and combat
 │   ├── enemy.lua         # Enemy creation, management, and combat
 │   ├── controls.lua      # Keyboard input and game controls
-│   ├── menu.lua          # Main menu system
-│   ├── pauseMenu.lua     # In-game pause menu system
-│   ├── gameOverScreen.lua # Game over screen with statistics
 │   ├── gameState.lua     # Game state management (menu/playing/paused/game_over)
-│   ├── menu/
-│   │   └── backgroundMap.lua  # Animated background world for menus
 │   ├── enemy/
 │   │   └── ai.lua        # Enemy AI behaviors and pathfinding
 │   ├── ui.lua            # Main UI controller

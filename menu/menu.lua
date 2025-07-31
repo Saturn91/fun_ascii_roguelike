@@ -4,7 +4,7 @@ local Menu = {}
 
 -- Import required modules
 local Colors = require("Colors")
-local BackgroundMap = require("game.menu.backgroundMap")
+local BackgroundMap = require("menu.backgroundMap")
 
 -- Menu state
 local selectedOption = 2  -- Start on "New Game"

@@ -8,8 +8,8 @@ local Enemy = require("game.enemy")
 local UI = require("game.ui")
 local Logger = require("game.ui.logger")
 local GameState = require("game.gameState")
-local PauseMenu = require("game.pauseMenu")
-local GameOverScreen = require("game.gameOverScreen")
+local PauseMenu = require("menu.pauseMenu")
+local GameOverScreen = require("menu.gameOverScreen")
 
 -- Game statistics tracking
 local gameStartTime = nil
