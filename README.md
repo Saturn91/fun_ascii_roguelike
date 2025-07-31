@@ -61,17 +61,55 @@ This font is perfect for ASCII roguelikes with its clean, monospace design that 
 
 ## Current Features
 
-- Basic ASCII grid rendering
-- Player movement (@)
-- Configurable font system
-- Grid-based movement system
+- ✅ Basic ASCII grid rendering with White Rabbit font
+- ✅ Player movement (@) with collision detection
+- ✅ **Walls and rooms system**
+- ✅ **Multiple interconnected rooms with corridors**
+- ✅ **ASCII-based UI system with dedicated panel**
+- ✅ **In-game logger with timestamps**
+- ✅ **Real-time player info display**
+- ✅ **Modular code structure (Room + Player + UI modules)**
+- ✅ Grid-based movement system constrained to game area
+
+## Code Structure
+
+```
+fun_ascii_roguelike/
+├── main.lua           # Main game loop and Love2D functions
+├── conf.lua           # Love2D configuration
+├── game/
+│   ├── room.lua       # Room generation and layout functions
+│   ├── player.lua     # Player creation and movement logic
+│   └── ui.lua         # UI system and logger
+└── assets/
+    └── fonts/
+        └── whitrabt.ttf # White Rabbit font
+```
+
+## UI System
+
+The game now features a dedicated ASCII UI panel on the right side (25% of screen width):
+
+### **Logger Panel** (Top Right)
+- Timestamped messages replace console output
+- Scrolling message history (20 messages max)
+- Game events and player actions logged in real-time
+
+### **Info Panel** (Bottom Right)
+- Real-time player position
+- Control instructions
+- Game status information
+
+### **Visual Elements**
+- ASCII borders (`|`, `-`, `+`) separate game area from UI
+- Color-coded sections for easy reading
+- All UI elements rendered using ASCII characters
 
 ## Next Steps
 
-- [ ] Add walls and rooms
 - [ ] Implement enemies
 - [ ] Add items and inventory
-- [ ] Create dungeon generation
+- [ ] Create procedural dungeon generation
 - [ ] Add combat system
 - [ ] Implement line of sight/fog of war
 
