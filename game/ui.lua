@@ -2,6 +2,10 @@
 -- Handles all user interface elements including logger
 local UI = {}
 
+-- Import UI sub-modules
+local TitleSection = require("game.ui.titleSection")
+local Logger = require("game.ui.logger")
+
 -- UI configuration
 local UI_WIDTH_RATIO = 0.25  -- UI takes up 25% of screen width
 local BORDER_CHARS = {
@@ -13,10 +17,6 @@ local BORDER_CHARS = {
     corner_br = "+",
     cross = "+"
 }
-
--- Logger configuration
-local MAX_LOG_MESSAGES = 27
-local logMessages = {}
 
 -- Initialize the UI system
 function UI.init(gridWidth, gridHeight, charWidth, charHeight)
@@ -66,26 +66,8 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         width = UI.uiArea.width - 2,
         height = UI.totalHeight - (UI.logArea.y + UI.logArea.height + 2)
     }
-    
-    -- Initialize with welcome message
-    UI.log("Welcome to ASCII Roguelike!")
-    UI.log("Use WASD or arrow keys to move")
-    UI.log("Press ESC to quit")
-    
-    return UI.gameAreaWidth, UI.totalHeight
-end
 
--- Logger function to replace print statements
-function UI.log(message)
-    local timestamp = os.date("%H:%M:%S")
-    local logEntry = string.format("[%s] %s", timestamp, tostring(message))
-    print(logEntry)
-    table.insert(logMessages, tostring(message))
-    
-    -- Remove old messages if we exceed the limit
-    while #logMessages > MAX_LOG_MESSAGES do
-        table.remove(logMessages, 1)
-    end
+    return UI.gameAreaWidth, UI.totalHeight
 end
 
 -- Draw the entire UI
@@ -99,11 +81,11 @@ function UI.draw(gameGrid, player)
     -- Draw UI panel border
     UI.drawUIPanelBorder(gameGrid)
     
-    -- Draw title section
-    UI.drawTitleSection(gameGrid)
+    -- Draw title section using TitleSection module
+    TitleSection.draw(gameGrid, UI.titleArea)
     
-    -- Draw logger content
-    UI.drawLogger(gameGrid)
+    -- Draw logger content using Logger module
+    Logger.draw(gameGrid, UI.logArea)
     
     -- Draw info panel content
     UI.drawInfoPanel(gameGrid, player)
@@ -208,98 +190,6 @@ function UI.drawUIPanelBorder(gameGrid)
     end
 end
 
--- Draw the title section content
-function UI.drawTitleSection(gameGrid)
-    local titleLines = {
-        "ASCII ROGUELIKE",
-        "---------------",
-        "Version: 1.0.0",
-        "",
-        "Made by:",
-        "Saturn91.dev"
-    }
-    
-    for i, line in ipairs(titleLines) do
-        local y = UI.titleArea.y + i - 1
-        if y <= UI.titleArea.y + UI.titleArea.height - 1 then
-            -- Center all title lines
-            local startX = UI.titleArea.x + math.floor((UI.titleArea.width - #line) / 2)
-            
-            for j = 1, math.min(#line, UI.titleArea.width) do
-                local x = startX + j - 1
-                if y <= #gameGrid and x <= #gameGrid[y] then
-                    local color = {0.9, 0.9, 0.9}  -- Default white
-                    
-                    -- Special colors for different sections
-                    if i == 1 then  -- Title
-                        color = {1, 0.8, 0.2}  -- Gold
-                    elseif line:match("Version:") then
-                        color = {0.6, 0.8, 1}  -- Light blue
-                    elseif line:match("Saturn91.dev") then
-                        color = {0.8, 1, 0.8}  -- Light green
-                    end
-                    
-                    gameGrid[y][x] = {
-                        char = line:sub(j, j),
-                        color = color,
-                        walkable = false
-                    }
-                end
-            end
-        end
-    end
-end
-
--- Draw the logger content
-function UI.drawLogger(gameGrid)
-    -- Draw "LOG" title
-    local titleY = UI.logArea.y - 1
-    local titleText = "LOG"
-    local startX = UI.logArea.x + math.floor((UI.logArea.width - #titleText) / 2)
-    
-    for i = 1, #titleText do
-        local x = startX + i - 1
-        if titleY <= #gameGrid and x <= #gameGrid[titleY] then
-            gameGrid[titleY][x] = {
-                char = titleText:sub(i, i),
-                color = {1, 1, 0.5},
-                walkable = false
-            }
-        end
-    end
-    
-    -- Draw log messages
-    local displayMessages = {}
-    local startIdx = math.max(1, #logMessages - UI.logArea.height + 1)
-    
-    for i = startIdx, #logMessages do
-        table.insert(displayMessages, logMessages[i])
-    end
-    
-    for i, message in ipairs(displayMessages) do
-        local y = UI.logArea.y + i - 1
-        if y <= UI.logArea.y + UI.logArea.height - 1 then
-            -- Wrap text if it's too long
-            local wrappedLines = UI.wrapText(message, UI.logArea.width)
-            for lineIdx, line in ipairs(wrappedLines) do
-                local currentY = y + lineIdx - 1
-                if currentY <= UI.logArea.y + UI.logArea.height - 1 then
-                    for j = 1, math.min(#line, UI.logArea.width) do
-                        local x = UI.logArea.x + j - 1
-                        if currentY <= #gameGrid and x <= #gameGrid[currentY] then
-                            gameGrid[currentY][x] = {
-                                char = line:sub(j, j),
-                                color = {0.9, 0.9, 0.9},
-                                walkable = false
-                            }
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
 -- Draw the info panel content
 function UI.drawInfoPanel(gameGrid, player)
     -- Draw "INFO" title
@@ -343,33 +233,6 @@ function UI.drawInfoPanel(gameGrid, player)
             end
         end
     end
-end
-
--- Wrap text to fit within specified width
-function UI.wrapText(text, maxWidth)
-    local lines = {}
-    local currentLine = ""
-    
-    for word in text:gmatch("%S+") do
-        if #currentLine + #word + 1 <= maxWidth then
-            if #currentLine > 0 then
-                currentLine = currentLine .. " " .. word
-            else
-                currentLine = word
-            end
-        else
-            if #currentLine > 0 then
-                table.insert(lines, currentLine)
-            end
-            currentLine = word
-        end
-    end
-    
-    if #currentLine > 0 then
-        table.insert(lines, currentLine)
-    end
-    
-    return lines
 end
 
 -- Get game area dimensions for the main game logic

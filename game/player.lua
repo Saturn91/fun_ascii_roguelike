@@ -59,9 +59,7 @@ function Player.moveTo(player, newX, newY, gameGrid, gridWidth, gridHeight)
             return true -- Movement successful
         else
             -- Player tried to walk into a wall
-            if UI then
-                UI.log("Bonk! Can't walk through walls!")
-            end
+            Logger.log("Bonk! That's a wall!")
             return false -- Movement blocked
         end
     end

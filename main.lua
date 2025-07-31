@@ -1,6 +1,9 @@
 -- ASCII Roguelike using Love2D
 -- Main game file
 
+-- global imports
+Logger = require("game.ui.logger")
+
 -- Import game modules
 local Room = require("game.room")
 local Player = require("game.player")
@@ -62,14 +65,6 @@ function love.load()
     local startX, startY = Room.findPlayerStartPosition(gameGrid, gameAreaWidth, gameAreaHeight)
     player = Player.new(startX, startY)
     Player.placeOnGrid(player, gameGrid)
-    
-    UI.log("Font loaded: White Rabbit")
-    UI.log("Character dimensions: " .. charWidth .. "x" .. charHeight)
-    UI.log("Grid dimensions: " .. gridWidth .. "x" .. gridHeight)
-    UI.log("Game area: " .. gameAreaWidth .. "x" .. gameAreaHeight)
-    UI.log("Rooms generated using Room module!")
-    UI.log("Player created using Player module!")
-    UI.log("UI system initialized!")
 end
 
 function love.update(dt)
