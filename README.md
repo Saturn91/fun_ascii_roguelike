@@ -19,7 +19,10 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 
 1. **Install Love2D** from [love2d.org](https://love2d.org/)
 2. **Run the game**:
-   - **Windows**: Run `"C:\Program Files\LOVE\love.exe" .` from the game directory
+   - **Windows**: Open PowerShell/Command Prompt in the game directory and run:
+     ```
+     & "C:\Program Files\LOVE\love.exe" .
+     ```
    - **Alternative**: Drag the game folder onto the Love2D executable
    - **General**: Run `love .` if Love2D is in your system PATH
 

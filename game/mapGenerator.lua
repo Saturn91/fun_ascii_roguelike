@@ -161,6 +161,93 @@ function MapGenerator.findClosestRoom(x, y, rooms)
     return closestRoom, minDistance
 end
 
+-- Connect all rooms with corridors using nearest neighbor approach
+function MapGenerator.connectRooms(gameGrid, rooms, gridWidth, gridHeight)
+    if #rooms < 2 then return end
+    
+    local connected = {}
+    local connections = {}
+    
+    -- Mark first room as connected
+    connected[1] = true
+    local connectedCount = 1
+    
+    -- Connect each unconnected room to the nearest connected room
+    while connectedCount < #rooms do
+        local bestConnection = nil
+        local shortestDistance = math.huge
+        local bestRoomIndex = nil
+        
+        -- Find the shortest connection between connected and unconnected rooms
+        for i = 1, #rooms do
+            if not connected[i] then
+                for j = 1, #rooms do
+                    if connected[j] then
+                        local distance = MapGenerator.getRoomDistance(rooms[i], rooms[j])
+                        if distance < shortestDistance then
+                            shortestDistance = distance
+                            bestConnection = {from = j, to = i}
+                            bestRoomIndex = i
+                        end
+                    end
+                end
+            end
+        end
+        
+        -- Create the corridor for the best connection
+        if bestConnection then
+            MapGenerator.createCorridor(gameGrid, rooms[bestConnection.from], rooms[bestConnection.to], gridWidth, gridHeight)
+            connected[bestRoomIndex] = true
+            connectedCount = connectedCount + 1
+            table.insert(connections, bestConnection)
+            
+            if Logger then
+                Logger.log(string.format("[info]Connected Room %d to Room %d[/info]", bestConnection.from, bestConnection.to))
+            end
+        end
+    end
+end
+
+-- Calculate distance between two rooms
+function MapGenerator.getRoomDistance(room1, room2)
+    local dx = room1.centerX - room2.centerX
+    local dy = room1.centerY - room2.centerY
+    return math.sqrt(dx * dx + dy * dy)
+end
+
+-- Create a corridor between two rooms
+function MapGenerator.createCorridor(gameGrid, room1, room2, gridWidth, gridHeight)
+    local startX, startY = room1.centerX, room1.centerY
+    local endX, endY = room2.centerX, room2.centerY
+    
+    -- Create L-shaped corridor (horizontal first, then vertical)
+    -- Horizontal segment
+    local minX = math.min(startX, endX)
+    local maxX = math.max(startX, endX)
+    for x = minX, maxX do
+        if x >= 1 and x <= gridWidth and startY >= 1 and startY <= gridHeight then
+            if gameGrid[startY] and gameGrid[startY][x] then
+                if not gameGrid[startY][x].walkable then
+                    gameGrid[startY][x] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
+                end
+            end
+        end
+    end
+    
+    -- Vertical segment
+    local minY = math.min(startY, endY)
+    local maxY = math.max(startY, endY)
+    for y = minY, maxY do
+        if endX >= 1 and endX <= gridWidth and y >= 1 and y <= gridHeight then
+            if gameGrid[y] and gameGrid[y][endX] then
+                if not gameGrid[y][endX].walkable then
+                    gameGrid[y][endX] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
+                end
+            end
+        end
+    end
+end
+
 -- Generate a complete map with rooms (entry point)
 function MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, options)
     options = options or {}
@@ -170,6 +257,11 @@ function MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, options)
     
     -- Generate rooms
     local rooms = MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, roomCount, minRoomSize, maxRoomSize)
+    
+    -- Connect rooms with corridors
+    if #rooms > 1 then
+        MapGenerator.connectRooms(gameGrid, rooms, gridWidth, gridHeight)
+    end
     
     -- Log generation results
     if Logger then
