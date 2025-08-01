@@ -20,7 +20,7 @@ local enemyConfig = {
     },
     skeleton = {
         char = "s",
-        color = "light_gray",
+        color = "white",
         health = 2,
         damage = 1,
         name = "Skeleton",
