@@ -1,20 +1,11 @@
 # ASCII Roguelike in Love2D
 
-A classic ASCII-based roguelike game built with the Love2D game engine. Features procedural room generation, modular architecture, colored text markup system, health management, enemy AI, combat mechanics, comprehensive ASCII-based UI, and a professional pause menu system.
+A classic ASCII-based roguelike game built with the Love2D game engine. Features procedural room generation, modular architecture, colored text markup system, health management, enemy AI, combat mechanics, comprehensive inventory system with equipment, and a professional pause menu system.
 
 ## Features
 
-- ✅ **Player-Editable Configurations** - Customize game balance via C   ├── ui.lua            # Main UI controller
-   └── ui/
-       ├── titleSection.lua   # Game title and info
-       ├── tabSystem.lua      # Tab navigation system
-       ├── tabs/              # Individual tab modules
-       │   ├── playerTab.lua  # Player information tab
-       │   ├── inventoryTab.lua # Inventory and weapons tab
-       │   └── statsTab.lua   # Game statistics tab
-       ├── Log.lua         # Colored message logging
-       ├── controls.lua       # Control instructions
-       └── healthBar.lua      # ASCII health visualizationes in appdata
+### Core Gameplay
+- ✅ **Player-Editable Configurations** - Customize game balance via CSV files in appdata
 - ✅ **Dynamic Configuration System** - Add new config types without code changes
 - ✅ **Configuration Validation** - Comprehensive error checking with fallback to defaults
 - ✅ **Integrated Font System** - No external font installation needed
@@ -22,14 +13,27 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - ✅ **Health Management** - Visual health bar with damage/healing mechanics
 - ✅ **Enemy AI System** - Multiple enemy types with different behaviors
 - ✅ **Combat Mechanics** - Turn-based combat with damage and health systems
+- ✅ **Room Generation** - Procedural rooms with corridors
+- ✅ **Player Movement** - Arrow key movement with collision detection (WASD removed for UI compatibility)
+
+### Inventory & Equipment System
+- ✅ **Full Inventory Management** - 10-slot backpack with equipment slots
+- ✅ **Equipment System** - Right hand, left hand, head, body, and feet slots
+- ✅ **Interactive Inventory UI** - Visual item selection with highlighting
+- ✅ **Item System Architecture** - Object-oriented items with inheritance (Weapons, Armor, Consumables)
+- ✅ **Weapon System** - Configurable weapons with damage and range stats
+- ✅ **Equipment Actions** - Equip, unequip, drop, and use items
+- ✅ **Smart Item Display** - Context-sensitive UI info for different item types
+- ✅ **Inventory Controller** - Reusable inventory logic for players, enemies, and NPCs
+
+### User Interface
+- ✅ **Tabbed Interface System** - Player, Inventory, and Stats tabs
 - ✅ **Pause Menu System** - In-game pause with semi-transparent overlay
 - ✅ **Game Over Screen** - Statistics display with retry/quit options
-- ✅ **Modular Architecture** - Clean, organized code structure
 - ✅ **ASCII-based UI** - Dedicated panels for logging, controls, and status
-- ✅ **Room Generation** - Procedural rooms with corridors
-- ✅ **Player Movement** - Grid-based movement with collision detection
 - ✅ **Real-time Logging** - Timestamped game events with color coding
 - ✅ **Game State Management** - Seamless transitions between menu, gameplay, and pause
+- ✅ **Modular Architecture** - Clean, organized code structure
 
 ## Installation & Setup
 
@@ -46,8 +50,32 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 
 ## Controls
 
+### Movement & Combat
 - **Arrow Keys**: Move player / Attack enemies (move into them)
 - **Escape**: Pause game (during gameplay) / Resume game (in pause menu) / Quit game (from main menu)
+
+### UI Navigation
+- **P**: Player tab
+- **I**: Inventory tab  
+- **S**: Stats tab
+
+### Inventory Controls
+**Equipment Slots:**
+- **R**: Right hand
+- **L**: Left hand
+- **H**: Head
+- **B**: Body
+- **F**: Feet
+
+**Backpack Slots:**
+- **1-9, 0**: Select backpack slots (0 = slot 10)
+
+**Item Actions:**
+- **E**: Equip item (from backpack to equipment)
+- **U**: Unequip item (from equipment) / Use item (consumables from backpack)
+- **D**: Drop item (remove from inventory) / Unequip item (from equipment slot)
+
+**Note**: WASD keys have been removed for movement to avoid conflicts with inventory controls.
 
 ### Main Menu Controls
 - **Arrow Keys** or **W/S**: Navigate menu options
@@ -80,6 +108,66 @@ When you die, the game over screen displays:
 - **Cause of death** (e.g., "Combat")
 - **Enemies defeated** during the session
 - **Time survived** in MM:SS format
+
+## Inventory & Equipment System
+
+The game features a comprehensive inventory and equipment system that allows players to manage items, weapons, and gear.
+
+### Inventory Structure
+
+**Equipment Slots (5 total):**
+- **Right Hand (R)**: Primary weapon slot
+- **Left Hand (L)**: Secondary weapon/shield slot  
+- **Head (H)**: Helmet/hat slot
+- **Body (B)**: Armor/clothing slot
+- **Feet (F)**: Boots/shoes slot
+
+**Backpack (10 slots):**
+- **Slots 1-9**: Accessible via number keys 1-9
+- **Slot 10**: Accessible via 0 key
+- **Storage**: Weapons, consumables, armor, and other items
+
+### Using the Inventory
+
+1. **Open Inventory Tab**: Press `I` to switch to the inventory interface
+2. **Select Items**: Use slot keys (R, L, H, B, F for equipment; 1-9, 0 for backpack)
+3. **View Item Details**: Selected items show character, name, and type-specific stats
+4. **Perform Actions**: Use action keys based on item location and type
+
+### Item Actions
+
+**From Backpack:**
+- **Equip (E)**: Move weapon/armor to appropriate equipment slot
+- **Use (U)**: Consume consumable items (potions, food, etc.)
+- **Drop (D)**: Remove item from inventory permanently
+
+**From Equipment:**
+- **Unequip (U)**: Move equipped item back to backpack
+- **Drop (D)**: Unequip item first, then remove from inventory
+
+### Item Types
+
+**Weapons:**
+- Display damage and range statistics
+- Can be equipped to hand slots
+- Used for combat and attacking enemies
+
+**Armor (Future):**
+- Will display defense and durability stats
+- Can be equipped to head, body, or feet slots
+- Provides protection against damage
+
+**Consumables (Future):**
+- Will display effects and duration
+- Used from backpack with 'U' key
+- Single-use items like potions and food
+
+### Smart Equipment System
+
+- **Auto-Swapping**: Equipping to an occupied slot automatically unequips the current item
+- **Inventory Full Protection**: Items won't be lost if backpack is full during unequipping
+- **Context-Sensitive UI**: Actions change based on item location and type
+- **Real-time Feedback**: All actions provide immediate log feedback
 
 ## Color Markup System
 
@@ -319,13 +407,37 @@ The game features a modular UI with four main components:
 - **Smart placement** - Automatic room positioning with buffer zones
 - **Extensible design** - Ready for corridor generation and advanced features
 
-#### **Item System** (`item.lua`)
-- **Base Item class** - Foundation for weapons, armor, and consumables
+#### **Item System** (`game/items/`)
+- **Base Item class** (`item.lua`) - Foundation for all game items with validation and UI info
+- **Weapon class** (`weapon.lua`) - Extends Item with damage, range, and combat-specific validation
+- **Armor class** (`armor.lua`) - Extends Item for defensive equipment (ready for future expansion)
+- **Consumable class** (`consumable.lua`) - Extends Item for usable items (ready for future expansion)
+- **ItemManager** (`itemManager.lua`) - Handles item creation, caching, and configuration integration
 - **Property validation** - Ensures all items have required id, name, char, and color
-- **Type safety** - Validates all item properties during creation
-- **Extensible design** - Ready for inheritance by specific item types
-- **Display utilities** - Built-in methods for item representation
-- **Error handling** - Descriptive error messages for invalid item configurations
+- **Type safety** - Validates item-specific properties (damage formulas, ranges, etc.)
+- **Inheritance system** - Clean object-oriented design with specialized item types
+- **UI integration** - Dynamic UI info display based on item type
+- **Configuration integration** - Seamless connection to weapon configuration system
+
+#### **Inventory System** (`game/inventoryController.lua`)
+- **Equipment management** - 5 equipment slots (right hand, left hand, head, body, feet)
+- **Backpack storage** - 10-slot inventory for carrying items
+- **Smart equipping** - Auto-swapping and validation when equipping items
+- **Context-aware actions** - Different actions based on item location and type
+- **Reusable controller** - Same system can be used for players, enemies, and NPCs
+- **Full item lifecycle** - Add, remove, move, equip, unequip, drop, and use items
+- **Safety checks** - Prevents item loss with full inventory protection
+- **Real-time feedback** - Immediate log messages for all inventory actions
+
+#### **Tabbed UI System** (`game/ui/`)
+- **Tab System** (`tabSystem.lua`) - Central controller for tab navigation and input routing
+- **Player Tab** (`tabs/playerTab.lua`) - Displays player stats and information
+- **Inventory Tab** (`tabs/inventoryTab.lua`) - Interactive inventory management with visual selection
+- **Stats Tab** (`tabs/statsTab.lua`) - Game statistics and progress tracking
+- **Modular design** - Easy to add new tabs and UI components
+- **Context-sensitive controls** - Different key bindings per tab
+- **Visual feedback** - Highlighting, color coding, and selection indicators
+- **Responsive layout** - Adapts to different content and screen sizes
 
 #### **Controls System** (`controls.lua`)
 - **Centralized input handling** - All keyboard controls in one module
