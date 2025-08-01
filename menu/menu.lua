@@ -5,6 +5,7 @@ local Menu = {}
 -- Import required modules
 local Colors = require("Colors")
 local BackgroundMap = require("menu.backgroundMap")
+local Log = require("game.ui.logger")  -- Import the logger component
 
 -- Menu state
 local selectedOption = 2  -- Start on "New Game"
@@ -18,6 +19,12 @@ local menuOptions = {
 function Menu.init()
     selectedOption = 2  -- Start on "New Game" instead of "Continue"
     BackgroundMap.init()
+    
+    -- Add some welcome messages to the logger
+    Log.clear()  -- Clear any existing messages
+    Log.log("[gold]Welcome to ASCII Roguelike![/gold]")
+    Log.log("[info]Select 'New Game' to start your adventure[/info]")
+    Log.log("[warning]Beware of the dangers that await![/warning]")
 end
 
 -- Draw the menu to the ASCII grid
@@ -78,9 +85,9 @@ function Menu.draw(gameGrid, gridWidth, gridHeight, dt)
         end
     end
     
-    -- Draw controls at the bottom
+    -- Draw controls between menu and logger
     local controlsText = "Arrow Keys/W,S: Navigate  Enter/Space: Select  Escape: Quit"
-    local controlsY = gridHeight - 2
+    local controlsY = centerY + 13  -- Position below menu options
     local controlsStartX = centerX - math.floor(string.len(controlsText) / 2)
     
     if controlsY > 0 and controlsStartX > 0 then
@@ -92,6 +99,19 @@ function Menu.draw(gameGrid, gridWidth, gridHeight, dt)
             end
         end
     end
+    
+    -- Define log area for menu (bottom area)
+    local LOG_HEIGHT = 8
+    local logWidth = math.floor(gridWidth * 0.6)  -- 60% of screen width
+    local logArea = {
+        x = math.floor((gridWidth - logWidth) / 2) + 1,  -- Center horizontally
+        y = gridHeight - LOG_HEIGHT - 1,  -- Position at bottom
+        width = logWidth,
+        height = LOG_HEIGHT
+    }
+    
+    -- Draw logger at the bottom
+    Log.draw(gameGrid, logArea)
     
     -- Draw "made by saturn91.dev" credit on the right side
     local creditText = "made by saturn91.dev"
