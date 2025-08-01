@@ -10,7 +10,7 @@ local logMessages = {}
 
 -- Logger function to replace print statements
 function Logger.log(message)
-    local timestamp = os.date("%H:%M:%S")
+    local timestamp = SaveOs.date("%H:%M:%S")
     local logEntry = string.format("[%s] %s", timestamp, tostring(message))
     print(logEntry)
     table.insert(logMessages, tostring(message))

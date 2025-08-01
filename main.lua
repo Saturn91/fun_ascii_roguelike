@@ -17,6 +17,9 @@ local Menu = require("menu.menu")
 local GameState = require("game.gameState")
 local PauseMenu = require("menu.pauseMenu")
 local GameOverScreen = require("menu.gameOverScreen")
+require("util._index")
+require("sandbox/Sandbox")
+Sandbox.init()
 
 function love.load()
     -- Set up the game window
