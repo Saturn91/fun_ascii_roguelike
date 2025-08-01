@@ -36,6 +36,11 @@ function Controls.handlePlayingInput(key, player, gameGrid)
         return
     end
     
+    -- Handle tab switching
+    if UI.handleTabInput(key) then
+        return  -- Tab was switched, don't process other input
+    end
+    
     -- Test keys for health bar (temporary)
     if key == "h" then
         Player.heal(player, 1)

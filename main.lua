@@ -14,6 +14,7 @@ require("game.__index")
 local UI = require("game.ui")
 local Controls = require("game.controls")
 local Menu = require("menu.menu")
+local GameOverScreen = require("menu.gameOverScreen")
 
 require("util._index")
 require("sandbox/Sandbox")

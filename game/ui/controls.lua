@@ -30,12 +30,17 @@ function Controls.draw(gameGrid, controlsArea)
         "  WASD - Move",
         "  Arrows - Move",
         "",
+        "Tabs:",
+        "  1/P - Player",
+        "  2/I - Inventory",
+        "  3/S - Stats",
+        "",
         "Actions:",
         "  H - Heal (+1 HP)",
         "  J - Damage (-1 HP)",
         "",
         "System:",
-        "  ESC - Quit Game"
+        "  ESC - Pause Game"
     }
     
     -- Draw control lines

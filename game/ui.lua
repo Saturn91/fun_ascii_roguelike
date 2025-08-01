@@ -6,6 +6,7 @@ local UI = {}
 local TitleSection = require("game.ui.titleSection")
 local HealthBar = require("game.ui.healthBar")
 local Controls = require("game.ui.controls")
+local TabSystem = require("game.ui.tabSystem")
 Log = require("game.ui.logger")  -- Make Log global for other modules to use
 
 -- UI configuration
@@ -72,6 +73,9 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         height = 8  -- Fixed height for info section
     }
     
+    -- Initialize tab system
+    TabSystem.init()
+    
     -- Controls area (game controls) - aligned with log area in y-direction
     UI.controlsArea = {
         x = UI.uiArea.x + 1,
@@ -104,8 +108,8 @@ function UI.draw(gameGrid, player)
     -- Draw title section using TitleSection module
     TitleSection.draw(gameGrid, UI.titleArea)
     
-    -- Draw info panel content
-    UI.drawInfoPanel(gameGrid, player)
+    -- Draw tab system instead of info panel
+    TabSystem.draw(gameGrid, UI.infoArea, player)
     
     -- Draw controls section using Controls module
     Controls.draw(gameGrid, UI.controlsArea)
@@ -337,6 +341,16 @@ end
 function UI.isInGameArea(x, y)
     return x >= UI.gameArea.x and x <= UI.gameArea.width and 
            y >= UI.gameArea.y and y <= UI.gameArea.height
+end
+
+-- Handle tab system input
+function UI.handleTabInput(key)
+    return TabSystem.handleInput(key)
+end
+
+-- Get current tab info for external reference
+function UI.getCurrentTab()
+    return TabSystem.getCurrentTab()
 end
 
 return UI
