@@ -36,27 +36,23 @@ function InventoryTab.draw(gameGrid, area, player)
         "INVENTORY",
         "",
         "Equipment:",
-        string.format("[r] right hand: %s", InventoryTab.getItemChar("equipment", "r")),
-        string.format("[l] left hand: %s", InventoryTab.getItemChar("equipment", "l")), 
-        string.format("[h] head: %s", InventoryTab.getItemChar("equipment", "h")),
-        string.format("[b] body: %s", InventoryTab.getItemChar("equipment", "b")),
-        string.format("[f] legs: %s", InventoryTab.getItemChar("equipment", "f")),
+        string.format("[r] right hand: %s", InventoryTab.getItemDisplay("equipment", "r")),
+        string.format("[l] left hand: %s", InventoryTab.getItemDisplay("equipment", "l")), 
+        string.format("[h] head: %s", InventoryTab.getItemDisplay("equipment", "h")),
+        string.format("[b] body: %s", InventoryTab.getItemDisplay("equipment", "b")),
+        string.format("[f] legs: %s", InventoryTab.getItemDisplay("equipment", "f")),
         "",
         "Backpack:",
-        string.format("[1]%s [2]%s [3]%s [4]%s [5]%s", 
-            InventoryTab.getItemChar("backpack", 1),
-            InventoryTab.getItemChar("backpack", 2),
-            InventoryTab.getItemChar("backpack", 3),
-            InventoryTab.getItemChar("backpack", 4),
-            InventoryTab.getItemChar("backpack", 5)
-        ),
-        string.format("[6]%s [7]%s [8]%s [9]%s [0]%s", 
-            InventoryTab.getItemChar("backpack", 6),
-            InventoryTab.getItemChar("backpack", 7),
-            InventoryTab.getItemChar("backpack", 8),
-            InventoryTab.getItemChar("backpack", 9),
-            InventoryTab.getItemChar("backpack", 10)
-        )
+        string.format("[1] %s", InventoryTab.getItemDisplay("backpack", 1)),
+        string.format("[2] %s", InventoryTab.getItemDisplay("backpack", 2)),
+        string.format("[3] %s", InventoryTab.getItemDisplay("backpack", 3)),
+        string.format("[4] %s", InventoryTab.getItemDisplay("backpack", 4)),
+        string.format("[5] %s", InventoryTab.getItemDisplay("backpack", 5)),
+        string.format("[6] %s", InventoryTab.getItemDisplay("backpack", 6)),
+        string.format("[7] %s", InventoryTab.getItemDisplay("backpack", 7)),
+        string.format("[8] %s", InventoryTab.getItemDisplay("backpack", 8)),
+        string.format("[9] %s", InventoryTab.getItemDisplay("backpack", 9)),
+        string.format("[0] %s", InventoryTab.getItemDisplay("backpack", 10))
     }
     
     -- Add item details if something is selected
@@ -101,6 +97,19 @@ function InventoryTab.getItemChar(inventoryType, slot)
     return "-"
 end
 
+-- Get item display string (character + name or just - if empty)
+function InventoryTab.getItemDisplay(inventoryType, slot)
+    if inventoryType == "equipment" then
+        local item = mockInventory.equipment[slot]
+        return item and string.format("%s %s", item.char, item.name) or "-"
+    elseif inventoryType == "backpack" then
+        local index = slot == 0 and 10 or slot
+        local item = mockInventory.backpack[index]
+        return item and string.format("%s %s", item.char, item.name) or "-"
+    end
+    return "-"
+end
+
 -- Get currently selected item
 function InventoryTab.getSelectedItem()
     if not selectedSlot or not selectedType then
@@ -138,7 +147,22 @@ function InventoryTab.drawLines(gameGrid, area, lines, color)
                     elseif line:match("^Controls:") then
                         lineColor = {0.7, 0.7, 0.7}  -- Gray for controls
                     elseif line:match("^%[") then
-                        lineColor = {0.9, 0.9, 1}  -- Light blue for slot lines
+                        -- Check if this is the currently selected slot
+                        local isSelected = false
+                        if selectedSlot and selectedType then
+                            if selectedType == "equipment" then
+                                isSelected = line:match("^%[" .. selectedSlot .. "%]")
+                            elseif selectedType == "backpack" then
+                                local keyToMatch = (selectedSlot == 10) and "0" or tostring(selectedSlot)
+                                isSelected = line:match("^%[" .. keyToMatch .. "%]")
+                            end
+                        end
+                        
+                        if isSelected then
+                            lineColor = {1, 1, 0}  -- Bright yellow for selected slot
+                        else
+                            lineColor = {0.9, 0.9, 1}  -- Light blue for regular slot lines
+                        end
                     end
                     
                     gameGrid[y][x] = {

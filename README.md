@@ -321,6 +321,14 @@ The game features a modular UI with four main components:
 - **Smart placement** - Automatic room positioning with buffer zones
 - **Extensible design** - Ready for corridor generation and advanced features
 
+#### **Item System** (`item.lua`)
+- **Base Item class** - Foundation for weapons, armor, and consumables
+- **Property validation** - Ensures all items have required id, name, char, and color
+- **Type safety** - Validates all item properties during creation
+- **Extensible design** - Ready for inheritance by specific item types
+- **Display utilities** - Built-in methods for item representation
+- **Error handling** - Descriptive error messages for invalid item configurations
+
 #### **Controls System** (`controls.lua`)
 - **Centralized input handling** - All keyboard controls in one module
 - **Game state management** - Handles victory/defeat conditions
@@ -394,6 +402,7 @@ fun_ascii_roguelike/
 │   ├── dice.lua          # Dice rolling system with formula parsing
 │   ├── room.lua          # Room system and player placement
 │   ├── mapGenerator.lua  # Procedural dungeon generation
+│   ├── item.lua          # Base Item class for weapons, armor, consumables
 │   ├── player.lua        # Player creation, movement, and combat
 │   ├── enemy.lua         # Enemy creation, management, and combat
 │   ├── controls.lua      # Keyboard input and game controls

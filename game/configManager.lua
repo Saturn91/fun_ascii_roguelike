@@ -119,7 +119,7 @@ local function csvToTable(csvContent, isArray, idField)
             
             if #parts >= #headers then
                 local id = parts[1]  -- First column is always the ID
-                local item = {}
+                local item = { id = id }
                 
                 -- Map remaining columns to their headers
                 for j = 2, #headers do
@@ -136,6 +136,8 @@ local function csvToTable(csvContent, isArray, idField)
                 end
                 
                 result[id] = item
+            else
+                Log.log("[error]missing field in: " .. json.stringify(parts, true) .. "[/error]")
             end
         end
     else
