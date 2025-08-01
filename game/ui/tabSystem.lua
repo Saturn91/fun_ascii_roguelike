@@ -9,9 +9,9 @@ local StatsTab = require("game.ui.tabs.statsTab")
 
 -- Tab definitions
 local TABS = {
-    {id = "player", name = "Player", key = "p", number = "1", module = PlayerTab},
-    {id = "inventory", name = "Inventory", key = "i", number = "2", module = InventoryTab},
-    {id = "stats", name = "Stats", key = "s", number = "3", module = StatsTab}
+    {id = "player", name = "Player", key = "p", module = PlayerTab},
+    {id = "inventory", name = "Inventory", key = "i", module = InventoryTab},
+    {id = "stats", name = "Stats", key = "s", module = StatsTab}
 }
 
 -- Current active tab (default to player)
@@ -39,7 +39,7 @@ end
 -- Switch tab by key input
 function TabSystem.handleInput(key)
     for i, tab in ipairs(TABS) do
-        if key == tab.key or key == tab.number then
+        if key == tab.key then
             currentTab = i
             if Log then
                 Log.log(string.format("[info]Switched to %s tab[/info]", tab.name))
@@ -48,6 +48,18 @@ function TabSystem.handleInput(key)
         end
     end
     return false
+end
+
+-- Handle custom key input for the current tab
+function TabSystem.handleTabSpecificInput(key, player, gameGrid)
+    local tab = TABS[currentTab]
+    
+    -- Check if current tab has custom key handling
+    if tab.module and tab.module.updateOnKeypressed then
+        return tab.module.updateOnKeypressed(key, player, gameGrid)
+    end
+    
+    return false  -- Key not handled by tab
 end
 
 -- Get current tab info
@@ -104,7 +116,7 @@ end
 function TabSystem.getTabControls()
     local controls = {}
     for _, tab in ipairs(TABS) do
-        table.insert(controls, string.format("%s/%s: %s", tab.number, string.upper(tab.key), tab.name))
+        table.insert(controls, string.format("%s: %s", string.upper(tab.key), tab.name))
     end
     return controls
 end

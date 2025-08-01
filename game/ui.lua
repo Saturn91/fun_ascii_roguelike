@@ -348,6 +348,11 @@ function UI.handleTabInput(key)
     return TabSystem.handleInput(key)
 end
 
+-- Handle tab-specific input for the currently active tab
+function UI.handleTabSpecificInput(key, player, gameGrid)
+    return TabSystem.handleTabSpecificInput(key, player, gameGrid)
+end
+
 -- Get current tab info for external reference
 function UI.getCurrentTab()
     return TabSystem.getCurrentTab()

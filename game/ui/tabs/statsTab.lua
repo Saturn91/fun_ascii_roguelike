@@ -36,4 +36,12 @@ function StatsTab.drawLines(gameGrid, area, lines, color)
     end
 end
 
+-- Handle stats tab specific input
+function StatsTab.updateOnKeypressed(key, player, gameGrid)
+    -- Stats tab controls (none implemented yet)
+    -- Could add controls for: resetting stats, detailed views, etc.
+    
+    return false  -- Key not handled
+end
+
 return StatsTab

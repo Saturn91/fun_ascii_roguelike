@@ -36,4 +36,12 @@ function PlayerTab.drawLines(gameGrid, area, lines, color)
     end
 end
 
+-- Handle player tab specific input
+function PlayerTab.updateOnKeypressed(key, player, gameGrid)
+    -- Player tab controls (none implemented yet)
+    -- Could add controls for: healing items, stat viewing, character info, etc.
+    
+    return false  -- Key not handled
+end
+
 return PlayerTab
