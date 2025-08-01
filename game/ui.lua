@@ -70,7 +70,7 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         x = UI.uiArea.x + 1,
         y = UI.titleArea.y + UI.titleArea.height + 2,  -- Position after title area + border
         width = UI.uiArea.width - 2,
-        height = 8  -- Fixed height for info section
+        height = UI.logArea.y - (UI.titleArea.y + UI.titleArea.height + 3)  -- Use space up to controls area
     }
     
     -- Initialize tab system
