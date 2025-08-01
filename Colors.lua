@@ -16,6 +16,8 @@ Colors.palette = {
     gray = {0.5, 0.5, 0.5},
     darkgray = {0.3, 0.3, 0.3},
     lightgray = {0.7, 0.7, 0.7},
+    light_gray = {0.7, 0.7, 0.7}, -- Alias for lightgray
+    brown = {0.6, 0.3, 0.0},      -- Brown color for orcs
     
     -- Game-specific colors
     health = {0, 0.8, 0},      -- Green for health
@@ -34,7 +36,6 @@ Colors.palette = {
     
     -- Player/Entity colors
     player = {1, 1, 0},        -- Yellow for player
-    enemy = {1, 0.3, 0.3},     -- Red for enemies
     npc = {0.3, 0.8, 1},       -- Light blue for NPCs
     item = {0.8, 0.6, 1},      -- Purple for items
 }

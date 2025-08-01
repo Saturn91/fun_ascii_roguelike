@@ -1,8 +1,10 @@
 -- Enemy module for ASCII Roguelike
 local Enemy = {}
 
--- Import AI module
+-- Import AI module, enemy configuration, and colors
 local EnemyAI = require("game.enemy.ai")
+local EnemyTypes = require("game.config.enemy")
+local Colors = require("Colors")
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
@@ -16,37 +18,6 @@ function Enemy.setUI(uiModule)
     UI = uiModule
 end
 
--- Enemy types with different characteristics
-local EnemyTypes = {
-    goblin = {
-        char = "g",
-        color = {0.0, 0.8, 0.0}, -- Green
-        health = 3,
-        damage = 1,
-        name = "Goblin",
-        moveChance = 0.3, -- 30% chance to move each turn
-        aggroRange = 3    -- Will chase player within 3 tiles
-    },
-    orc = {
-        char = "O",
-        color = {0.6, 0.3, 0.0}, -- Brown
-        health = 5,
-        damage = 2,
-        name = "Orc",
-        moveChance = 0.2, -- 20% chance to move each turn
-        aggroRange = 4    -- Will chase player within 4 tiles
-    },
-    skeleton = {
-        char = "s",
-        color = {0.9, 0.9, 0.9}, -- Light gray
-        health = 2,
-        damage = 1,
-        name = "Skeleton",
-        moveChance = 0.4, -- 40% chance to move each turn
-        aggroRange = 2    -- Will chase player within 2 tiles
-    }
-}
-
 -- List to store all active enemies
 local enemies = {}
 
@@ -57,11 +28,17 @@ function Enemy.new(x, y, enemyType)
         error("Unknown enemy type: " .. tostring(enemyType))
     end
     
+    -- Resolve color string to actual color values
+    local color = template.color
+    if type(color) == "string" then
+        color = Colors.palette[color] or Colors.palette.white -- Fallback to white if color not found
+    end
+    
     local enemy = {
         x = x,
         y = y,
         char = template.char,
-        color = template.color,
+        color = color,
         health = template.health,
         maxHealth = template.health,
         damage = template.damage,

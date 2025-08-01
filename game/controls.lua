@@ -4,6 +4,7 @@ local Controls = {}
 
 -- Import required modules
 local Player = require("game.player")
+local PlayerConfig = require("game.config.player")
 local Enemy = require("game.enemy")
 local UI = require("game.ui")
 local GameState = require("game.gameState")
@@ -37,10 +38,10 @@ function Controls.handlePlayingInput(key, player, gameGrid)
     
     -- Test keys for health bar (temporary)
     if key == "h" then
-        Player.heal(player, 1)  -- Heal 1 HP with 'h' key
+        Player.heal(player, 1)
         return
     elseif key == "j" then
-        Player.takeDamage(player, 1)  -- Take 1 damage with 'j' key
+        Player.takeDamage(player, 1)
         return
     end
     
