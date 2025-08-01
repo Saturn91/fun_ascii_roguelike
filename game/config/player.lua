@@ -3,6 +3,7 @@ local playerConfig = {
     char = "@",
     color = "", --if nil or empty use default color [player]
     health = 10,
+    weapon = "sword", -- optional
     baseAttackDamage = 2,
 }
 

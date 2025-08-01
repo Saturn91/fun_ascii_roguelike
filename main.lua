@@ -10,10 +10,9 @@ Log = require("game.ui.Logger")
 -- Import game modules
 local Fonts = require("fonts")
 local AsciiGrid = require("asciiGrid")
-require("game.__index")
+local Game = require("game.__index")
 local UI = require("game.ui")
 local Controls = require("game.controls")
-local Menu = require("menu.menu")
 local GameOverScreen = require("menu.gameOverScreen")
 
 require("util._index")
@@ -46,8 +45,7 @@ function love.load()
     gameGrid, gridWidth, gridHeight = AsciiGrid.init(windowWidth, windowHeight, charWidth, charHeight, tempGridWidth, tempGridHeight)
     
     -- Initialize game state and menu
-    GameState.init()
-    Menu.init()
+    Game.init()
     
     -- Game variables (will be initialized when starting new game)
     player = nil
