@@ -26,6 +26,8 @@ require("sandbox/Sandbox")
 Sandbox.init()
 
 function love.load()
+     Log.log("[gold]Welcome human![/gold] Lets get started")
+     
     -- Initialize configuration manager first
     ConfigManager.load()
     

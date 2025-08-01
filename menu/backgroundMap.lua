@@ -31,7 +31,7 @@ function BackgroundMap.generate(gridWidth, gridHeight)
     end
     
     -- Generate rooms and corridors for background
-    MapGenerator.generate(backgroundGrid, gridWidth, gridHeight)
+    MapGenerator.generate(backgroundGrid, gridWidth, gridHeight, true)
     
     -- Spawn enemies in the background
     backgroundEnemies = {}

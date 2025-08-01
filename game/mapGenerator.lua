@@ -3,10 +3,12 @@
 local MapGenerator = {}
 
 -- Generate non-overlapping rooms on the map
-function MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, amount, minSize, maxSize)
-    amount = amount or 5
-    minSize = minSize or 5
-    maxSize = maxSize or 8
+function MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, options)
+    options = options or {}
+    local amount = options.amount or 5
+    local minSize = options.minSize or 5
+    local maxSize = options.maxSize or 8
+    local silent = options.silent or false
     
     local rooms = {}
     local maxAttempts = 500 -- Increased from 100 to allow more attempts
@@ -57,7 +59,7 @@ function MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, amount, min
     end
     
     -- Log generation statistics
-    if Log then
+    if Log and not silent then
         if #rooms < amount then
             local reason = ""
             if attempts >= maxAttempts then
@@ -275,9 +277,15 @@ function MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, options)
     local roomCount = options.roomCount or 5
     local minRoomSize = options.minRoomSize or 5
     local maxRoomSize = options.maxRoomSize or 8
+    local silent = options.silent or false
     
     -- Generate rooms
-    local rooms = MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, roomCount, minRoomSize, maxRoomSize)
+    local rooms = MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, {
+        amount = roomCount,
+        minSize = minRoomSize,
+        maxSize = maxRoomSize,
+        silent = silent
+    })
     
     -- Connect rooms with corridors
     if #rooms > 1 then
@@ -285,7 +293,7 @@ function MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, options)
     end
     
     -- Log generation results
-    if Log then
+    if Log and not silent then
         Log.log(string.format("[info]Map: %d rooms[/info]", #rooms))
     end
     
@@ -293,7 +301,7 @@ function MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, options)
 end
 
 -- Generate the default map layout for the game (main entry point)
-function MapGenerator.generate(gameGrid, gridWidth, gridHeight)
+function MapGenerator.generate(gameGrid, gridWidth, gridHeight, silent)
     -- Generate a random number of rooms between 10-20
     local roomCount = love.math.random(10, 20)
     
@@ -301,7 +309,8 @@ function MapGenerator.generate(gameGrid, gridWidth, gridHeight)
     local rooms = MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, {
         roomCount = roomCount,
         minRoomSize = 4,  -- Reduced min size to fit more rooms
-        maxRoomSize = 7   -- Reduced max size to fit more rooms
+        maxRoomSize = 7,  -- Reduced max size to fit more rooms
+        silent = silent
     })
     
     -- Store rooms for later use (e.g., pathfinding, player placement)
