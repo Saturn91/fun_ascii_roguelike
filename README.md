@@ -4,6 +4,9 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 
 ## Features
 
+- ✅ **Player-Editable Configurations** - Customize game balance via CSV files in appdata
+- ✅ **Dynamic Configuration System** - Add new config types without code changes
+- ✅ **Configuration Validation** - Comprehensive error checking with fallback to defaults
 - ✅ **Integrated Font System** - No external font installation needed
 - ✅ **Color Markup System** - Rich colored text with `[color]text[/color]` syntax
 - ✅ **Health Management** - Visual health bar with damage/healing mechanics
@@ -86,6 +89,153 @@ The game features a sophisticated color markup system for enhanced visual feedba
 [warning]Be careful![/warning]
 Welcome to the [green]ASCII Roguelike[/green]!
 ```
+
+## Customizing Game Configuration
+
+The game features a powerful **configuration system** that allows players to easily customize game balance, enemy stats, and player attributes without modifying the game code. All configuration files are stored in **CSV format** for easy editing.
+
+### Configuration System Overview
+
+- **📁 Location**: Configuration files are automatically created in your system's **appdata folder** under `config/`
+- **📊 Format**: Human-readable **CSV files** that can be edited with any text editor or spreadsheet application
+- **🔄 Auto-generation**: Default configuration files are created automatically on first game launch
+- **✅ Validation**: All configuration changes are validated to ensure game stability
+- **🎯 Hot-reloading**: Changes take effect the next time you start the game
+
+### Configuration Files
+
+#### **Player Configuration** (`player.csv`)
+
+Controls player stats and attributes:
+
+```csv
+property,value
+health,10
+baseAttackDamage,2
+char,@
+color,yellow
+```
+
+**Editable Properties:**
+- `health` - Starting player health (1-1000)
+- `baseAttackDamage` - Player attack damage (1-100)
+- `char` - Player character symbol (single character)
+- `color` - Player color (see available colors below)
+
+#### **Enemy Configuration** (`enemy.csv`)
+
+Controls all enemy types and their stats:
+
+```csv
+id,char,color,health,damage,name,moveChance,aggroRange
+goblin,g,green,3,1,Goblin,0.3,3
+orc,O,brown,5,2,Orc,0.2,4
+skeleton,s,white,2,1,Skeleton,0.4,2
+```
+
+**Editable Properties:**
+- `id` - Unique enemy identifier (used internally)
+- `char` - Enemy character symbol (single character)
+- `color` - Enemy color (see available colors below)
+- `health` - Enemy health points (1-1000)
+- `damage` - Enemy attack damage (1-100)
+- `name` - Display name for the enemy
+- `moveChance` - Probability of movement per turn (0.0-1.0)
+- `aggroRange` - Range at which enemy will chase player (1-50)
+
+### Available Colors
+
+All color values support these options:
+- **Basic**: `red`, `green`, `blue`, `yellow`, `cyan`, `magenta`, `white`, `black`
+- **Extended**: `orange`, `purple`, `pink`, `lime`, `brown`, `gray`, `darkgray`, `lightgray`
+- **Game-specific**: `health`, `damage`, `warning`, `info`, `success`, `error`
+
+### How to Customize
+
+1. **Launch the game** - Configuration files are created automatically on first run
+2. **Locate config folder** - Find the `config/` folder in your system's appdata directory:
+   - **Windows**: `%APPDATA%/LOVE/fun_ascii_roguelike/config/`
+   - **macOS**: `~/Library/Application Support/LOVE/fun_ascii_roguelike/config/`
+   - **Linux**: `~/.local/share/love/fun_ascii_roguelike/config/`
+3. **Edit files** - Open `player.csv` or `enemy.csv` with any text editor or spreadsheet application
+4. **Save changes** - Save the file in CSV format
+5. **Restart game** - Changes take effect on next game launch
+
+### Example Customizations
+
+#### **Creating a Powerful Player**
+```csv
+property,value
+health,25
+baseAttackDamage,5
+char,@
+color,gold
+```
+
+#### **Adding a New Enemy Type**
+Add a new row to `enemy.csv`:
+```csv
+id,char,color,health,damage,name,moveChance,aggroRange
+dragon,D,red,20,8,Dragon,0.1,6
+```
+
+#### **Making Enemies Faster**
+Increase `moveChance` values:
+```csv
+id,char,color,health,damage,name,moveChance,aggroRange
+goblin,g,green,3,1,Goblin,0.8,3
+orc,O,brown,5,2,Orc,0.7,4
+skeleton,s,white,2,1,Skeleton,0.9,2
+```
+
+### Configuration Validation
+
+The system includes comprehensive validation to prevent game-breaking changes:
+
+- **Range checking** - All numeric values are validated against safe ranges
+- **Type validation** - Ensures proper data types (numbers, strings, etc.)
+- **Required fields** - Verifies all essential properties are present
+- **Character validation** - Ensures character symbols are single characters
+- **Color validation** - Checks that color names are valid
+- **Error handling** - Invalid configurations fall back to defaults with error logging
+
+### Adding New Configuration Types
+
+The configuration system is designed to be **easily extensible**. To add new config types:
+
+1. **Create config module** - Add new `.lua` file in `game/config/`
+2. **Define structure** - Create default configuration object
+3. **Add validation** - Implement `validate(config)` function
+4. **Register config** - Add entry to `configs` table in `configManager.lua`
+
+**Example new config registration:**
+```lua
+WEAPONS = {
+    csvName = "weapons",
+    luaName = "game.config.weapons",
+    isArray = true,
+    idField = "id"
+}
+```
+
+The system will automatically handle CSV generation, loading, saving, and validation for any new configuration type!
+
+### Troubleshooting
+
+**Configuration not loading?**
+- Check that CSV files are properly formatted
+- Ensure all required columns are present
+- Verify that values are within valid ranges
+- Check game log for validation error messages
+
+**Invalid values?**
+- The game will log specific validation errors
+- Invalid configurations automatically fall back to safe defaults
+- Fix the CSV file and restart the game
+
+**Reset to defaults?**
+- Delete the configuration files from the appdata folder
+- The game will recreate them with default values on next launch
 
 ## Game Architecture
 
@@ -210,12 +360,26 @@ fun_ascii_roguelike/
 ├── fonts.lua             # Integrated font management system
 ├── asciiGrid.lua         # ASCII grid rendering and management
 ├── Colors.lua            # Color palette and markup parser
+├── LocalFileUtil.lua     # File operations for appdata storage
+├── util/                 # Utility modules and helper functions
+│   ├── _index.lua        # Utility module loader
+│   ├── TextUtil.lua      # Text positioning and rendering utilities
+│   ├── LocalFileUtil.lua # File operations and image saving utilities
+│   └── CloneUtil.lua     # Deep object cloning utilities
+├── sandbox/              # Security sandbox system
+│   ├── Sandbox.lua       # Main sandbox initialization and restrictions
+│   ├── SaveOs.lua        # OS command whitelist and protection
+│   └── SaveIo.lua        # IO operation restrictions and logging
 ├── menu/                 # Menu system components
 │   ├── menu.lua          # Main menu system
 │   ├── pauseMenu.lua     # In-game pause menu system
 │   ├── gameOverScreen.lua # Game over screen with statistics
 │   └── backgroundMap.lua # Animated background world for menus
 ├── game/
+│   ├── configManager.lua # Dynamic configuration management system
+│   ├── config/           # Default configuration modules
+│   │   ├── player.lua    # Default player configuration with validation
+│   │   └── enemy.lua     # Default enemy configurations with validation
 │   ├── room.lua          # Room system and player placement
 │   ├── mapGenerator.lua  # Procedural dungeon generation
 │   ├── player.lua        # Player creation, movement, and combat
@@ -234,6 +398,45 @@ fun_ascii_roguelike/
     └── fonts/
         └── DejaVuSansMono.ttf # Integrated monospace font
 ```
+
+### Configuration System Architecture
+
+The game features a **modular configuration system** located in `game/config/` and managed by `configManager.lua`:
+
+#### **ConfigManager** (`game/configManager.lua`)
+- **Dynamic loading** - Automatically loads and validates all configuration types
+- **CSV handling** - Converts between Lua tables and human-readable CSV files
+- **Validation integration** - Uses config-specific validation functions
+- **Error handling** - Falls back to defaults when configurations are invalid
+- **Extensible design** - Easy to add new configuration types
+
+#### **Default Configurations** (`game/config/`)
+- **player.lua** - Default player stats and validation rules
+- **enemy.lua** - Default enemy configurations with comprehensive validation
+- **Modular validation** - Each config includes its own `validate()` function
+- **Type safety** - Ensures all configuration values are valid and within safe ranges
+
+#### **User Configurations** (Appdata CSV Files)
+- **player.csv** - User-editable player configuration
+- **enemy.csv** - User-editable enemy configurations  
+- **Auto-generated** - Created automatically with defaults if missing
+- **Validated** - All user changes are validated against default rules
+
+### Utility System Architecture
+
+The game includes comprehensive utility modules for common operations:
+
+#### **Utility Modules** (`util/`)
+- **TextUtil.lua** - Text positioning, centering, and rendering utilities
+- **LocalFileUtil.lua** - File operations, image saving, and appdata management
+- **CloneUtil.lua** - Deep object cloning for data protection and copying
+- **_index.lua** - Module loader for automatic utility imports
+
+#### **Sandbox Security System** (`sandbox/`)
+- **Sandbox.lua** - Main security initialization and global function restrictions
+- **SaveOs.lua** - OS command whitelist and protection against harmful system calls
+- **SaveIo.lua** - IO operation restrictions and logging for file access control
+- **Extensible protection** - Modular security layers for different system access levels
 
 ## Development Features
 
@@ -275,6 +478,7 @@ fun_ascii_roguelike/
 - [x] ~~Pause menu system~~ ✅ **Professional pause menu implemented!**
 - [x] ~~Game state management~~ ✅ **Complete state system implemented!**
 - [x] ~~Game over screen~~ ✅ **Statistics-based game over screen implemented!**
+- [x] ~~Costumizable configs~~ ✅ **config Manager which can read from costumizable files**
 - [ ] Item and inventory system
 - [ ] Extended procedural dungeon generation
 - [ ] Advanced AI behaviors (group tactics, special abilities)
