@@ -8,7 +8,7 @@ function ItemManager.init()
     itemDefinitions = {}
 
     for key, weapon in pairs(ConfigManager.WEAPONS) do
-        itemDefinitions[key] = Item.new(weapon)
+        itemDefinitions[key] = Weapon.new(weapon)
     end
 end
 

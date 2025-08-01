@@ -8,6 +8,8 @@ function Weapon.new(config)
     if not config then error("Weapon config is required") end
     local weapon = setmetatable(Item.new(config), Weapon)
 
+    weapon.type = Item.TYPE.weapon
+
     return weapon
 end
 

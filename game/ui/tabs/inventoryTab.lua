@@ -41,7 +41,12 @@ function InventoryTab.draw(gameGrid, area, player)
             table.insert(lines, string.format("Char: %s", item.char))
             table.insert(lines, string.format("Name: %s", item.name))
             table.insert(lines, "")
-            table.insert(lines, "Actions: [E]quip [D]rop [U]se")
+            -- Show different actions based on item location
+            if selectedType == "equipment" then
+                table.insert(lines, "Actions: [U]nequip [D]rop")
+            else
+                table.insert(lines, "Actions: [E]quip [D]rop [U]se")
+            end
         else
             table.insert(lines, "")
             table.insert(lines, "Empty slot selected")
@@ -184,7 +189,11 @@ function InventoryTab.updateOnKeypressed(key, player, gameGrid)
             InventoryTab.dropItem(player)
             return true
         elseif key == "u" then
-            InventoryTab.useItem(player)
+            if selectedType == "equipment" then
+                InventoryTab.unequipItem(player)
+            else
+                InventoryTab.useItem(player)
+            end
             return true
         end
     end
@@ -215,21 +224,59 @@ end
 -- Handle item actions
 function InventoryTab.equipItem(player)
     local item = InventoryTab.getSelectedItem(player)
-    if item then
-        if Log then
-            Log.log(string.format("[info]Equipping %s[/info]", item.name))
+    if item and selectedType == "backpack" then
+        -- Only allow equipping from backpack slots
+        local success = player.inventory:equip(selectedSlot, "r")
+        if success then
+            if Log then
+                Log.log(string.format("[info]Equipped %s to right hand[/info]", item.name))
+            end
+        else
+            if Log then
+                Log.log(string.format("[warning]Failed to equip %s[/warning]", item.name))
+            end
         end
-        -- TODO: Implement equip logic
+    elseif selectedType == "equipment" then
+        if Log then
+            Log.log("[warning]Cannot equip an already equipped item[/warning]")
+        end
+    else
+        if Log then
+            Log.log("[warning]No item selected to equip[/warning]")
+        end
     end
 end
 
 function InventoryTab.dropItem(player)
     local item = InventoryTab.getSelectedItem(player)
-    if item then
-        if Log then
-            Log.log(string.format("[info]Dropping %s[/info]", item.name))
+    if item and selectedType == "backpack" then
+        -- Only allow dropping from backpack slots
+        local droppedItem = player.inventory:drop(selectedSlot)
+        if droppedItem then
+            if Log then
+                Log.log(string.format("[info]Dropped %s[/info]", droppedItem.name))
+            end
+        else
+            if Log then
+                Log.log("[warning]Failed to drop item[/warning]")
+            end
         end
-        -- TODO: Implement drop logic
+    elseif selectedType == "equipment" then
+        -- For equipment, first unequip then drop
+        local success = player.inventory:unequip(selectedSlot)
+        if success then
+            if Log then
+                Log.log(string.format("[info]Unequipped %s[/info]", item.name))
+            end
+        else
+            if Log then
+                Log.log("[warning]Failed to unequip item (backpack might be full)[/warning]")
+            end
+        end
+    else
+        if Log then
+            Log.log("[warning]No item selected to drop[/warning]")
+        end
     end
 end
 
@@ -240,6 +287,26 @@ function InventoryTab.useItem(player)
             Log.log(string.format("[info]Using %s[/info]", item.name))
         end
         -- TODO: Implement use logic
+    end
+end
+
+function InventoryTab.unequipItem(player)
+    local item = InventoryTab.getSelectedItem(player)
+    if item and selectedType == "equipment" then
+        local success = player.inventory:unequip(selectedSlot)
+        if success then
+            if Log then
+                Log.log(string.format("[info]Unequipped %s[/info]", item.name))
+            end
+        else
+            if Log then
+                Log.log("[warning]Failed to unequip item (backpack might be full)[/warning]")
+            end
+        end
+    else
+        if Log then
+            Log.log("[warning]No equipped item selected to unequip[/warning]")
+        end
     end
 end
 

@@ -39,7 +39,8 @@ function Player.new(x, y, health)
     }
 
     if ConfigManager.PLAYER.weapon then
-        instance.inventory:addItem(ConfigManager.PLAYER.weapon)
+        local slot = instance.inventory:addItem(ConfigManager.PLAYER.weapon)
+        instance.inventory:equip(slot)
     end
 
     return instance

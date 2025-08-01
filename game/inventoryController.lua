@@ -26,12 +26,47 @@ function InventoryController.new()
 end
 
 -- Equipment Management
-function InventoryController:equip(slot, equipmentType)
-    --TODO: Move item from backpack slot to equipment slot
+function InventoryController:equip(slot)
+    -- Get item from backpack slot
+    local item = self.backpack[slot]
+    if not item then
+        return false -- No item in slot
+    end
+    
+    local targetSlot = nil
+    if item.type == Item.TYPE.weapon then targetSlot = "r" end
+
+    if targetSlot == nil then Log.error("not able to equip: " .. item.type) end
+
+    if self.equipment[targetSlot] then
+        self:unequip(targetSlot)
+    end
+    
+    -- Move item from backpack to equipment
+    self.equipment[targetSlot] = item
+    self.backpack[slot] = nil
+    
+    return true
 end
 
 function InventoryController:unequip(equipmentType)
-    --TODO: Move item from equipment slot to first available backpack slot
+    -- Get equipped item
+    local item = self.equipment[equipmentType]
+    if not item then
+        return false -- No item equipped
+    end
+    
+    -- Find first empty backpack slot
+    local emptySlot = self:getEmptySlot()
+    if not emptySlot then
+        return false -- Backpack is full
+    end
+    
+    -- Move item from equipment to backpack
+    self.backpack[emptySlot] = item
+    self.equipment[equipmentType] = nil
+    
+    return true
 end
 
 function InventoryController:getEquipped(equipmentType)
@@ -58,7 +93,12 @@ function InventoryController:addItem(item)
 end
 
 function InventoryController:removeItem(slot)
-    --TODO: Remove and return item from specified backpack slot
+    local item = self.backpack[slot]
+    if item then
+        self.backpack[slot] = nil
+        return item
+    end
+    return nil
 end
 
 function InventoryController:getItem(slot)
@@ -74,7 +114,12 @@ function InventoryController:use(slot)
 end
 
 function InventoryController:drop(slot)
-    --TODO: Drop item from inventory (remove without adding to world yet)
+    local item = self:removeItem(slot)
+    if item then
+        -- For now, just remove the item (later could add to world)
+        return item
+    end
+    return nil
 end
 
 -- Utility Methods
@@ -87,7 +132,12 @@ function InventoryController:isFull()
 end
 
 function InventoryController:getEmptySlot()
-    --TODO: Return first empty backpack slot number, or nil if full
+    for i = 1, 10 do
+        if self.backpack[i] == nil then
+            return i
+        end
+    end
+    return nil -- No empty slots
 end
 
 function InventoryController:getAllItems()
