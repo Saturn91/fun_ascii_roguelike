@@ -5,7 +5,7 @@ local Log = {}
 local Colors = require("Colors")
 
 -- Log configuration
-local MAX_LOG_MESSAGES = 21
+local MAX_LOG_MESSAGES = 11  -- Reduced to 10 since we have less height but more width
 local logMessages = {}
 
 -- Log function to replace print statements
@@ -23,6 +23,11 @@ end
 
 function Log.error(message)
     Log.log("[red]-->err:" .. message .. "[/red]")
+end
+
+-- Clear all log messages
+function Log.clear()
+    logMessages = {}
 end
 
 -- Wrap colored text segments to fit within specified width
@@ -94,10 +99,23 @@ end
 
 -- Draw the Log content
 function Log.draw(gameGrid, logArea)
-    -- Draw "LOG" title
+    -- First, clear the entire log area to prevent old text remnants
+    for y = logArea.y, logArea.y + logArea.height - 1 do
+        for x = logArea.x, logArea.x + logArea.width - 1 do
+            if y <= #gameGrid and x <= #gameGrid[y] then
+                gameGrid[y][x] = {
+                    char = " ",
+                    color = {0, 0, 0},  -- Black color for empty space
+                    walkable = false
+                }
+            end
+        end
+    end
+
+    -- Draw "LOG" title in the top border area
     local titleY = logArea.y - 1
     local titleText = "LOG"
-    local startX = logArea.x + math.floor((logArea.width - #titleText) / 2)
+    local startX = logArea.x + math.floor((logArea.width - #titleText) / 2)  -- Center the title
     
     for i = 1, #titleText do
         local x = startX + i - 1

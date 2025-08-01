@@ -6,6 +6,7 @@ local UI = {}
 local TitleSection = require("game.ui.titleSection")
 local HealthBar = require("game.ui.healthBar")
 local Controls = require("game.ui.controls")
+Log = require("game.ui.logger")  -- Make Log global for other modules to use
 
 -- UI configuration
 local UI_WIDTH_RATIO = 0.25  -- UI takes up 25% of screen width
@@ -29,14 +30,25 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
     UI.charWidth = charWidth
     UI.charHeight = charHeight
     
-    -- UI sections (health bar over game area, UI extends to top)
+    local LOG_HEIGHT = 13
+    
+    -- Log area spans full width except for sidebar
+    UI.logArea = {
+        x = 2,  -- Moved 1 space to the right (was 1)
+        y = UI.totalHeight - LOG_HEIGHT + 2,
+        width = UI.gameAreaWidth - 1,  -- Reduced width by 1 to account for shift
+        height = LOG_HEIGHT - 2  -- 10 lines for actual log content
+    }
+    
+    -- Game area (reduced height to make room for log at bottom)
     UI.gameArea = {
         x = 1,
         y = 2,  -- Start one row down to make room for health bar
         width = UI.gameAreaWidth,
-        height = UI.totalHeight - 1  -- Reduce height by 1 for health bar
+        height = UI.totalHeight - LOG_HEIGHT - 1  -- Reduced by log height + health bar
     }
     
+    -- UI area (sidebar on right, full height)
     UI.uiArea = {
         x = UI.gameAreaWidth + 1,
         y = 1,  -- UI section extends to the very top
@@ -52,32 +64,20 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         height = 8  -- Space for title, version, and author
     }
     
-    -- Log area (moved down to make room for title)
-    UI.logArea = {
+    -- Info area (player information) - now positioned after title
+    UI.infoArea = {
         x = UI.uiArea.x + 1,
         y = UI.titleArea.y + UI.titleArea.height + 2,  -- Position after title area + border
         width = UI.uiArea.width - 2,
-        height = math.floor(UI.totalHeight * 0.6) - 2 - UI.titleArea.height - 2  -- Adjust for title space
+        height = 8  -- Fixed height for info section
     }
     
-    -- Info area (player information)
-    local remainingHeight = UI.totalHeight - (UI.logArea.y + UI.logArea.height + 2)
-    local infoHeight = math.floor(remainingHeight * 0.4)  -- 40% for info
-    local controlsHeight = remainingHeight - infoHeight - 2  -- Rest for controls (minus separator)
-    
-    UI.infoArea = {
-        x = UI.uiArea.x + 1,
-        y = UI.logArea.y + UI.logArea.height + 2,
-        width = UI.uiArea.width - 2,
-        height = infoHeight
-    }
-    
-    -- Controls area (game controls)
+    -- Controls area (game controls) - aligned with log area in y-direction
     UI.controlsArea = {
         x = UI.uiArea.x + 1,
-        y = UI.infoArea.y + UI.infoArea.height + 2,
+        y = UI.logArea.y,  -- Align with log area y position
         width = UI.uiArea.width - 2,
-        height = controlsHeight
+        height = UI.logArea.height  -- Same height as log area
     }
 
     return UI.gameAreaWidth, UI.gameArea.height
@@ -97,11 +97,12 @@ function UI.draw(gameGrid, player)
     -- Draw UI panel border
     UI.drawUIPanelBorder(gameGrid)
     
+    -- Draw log area border and content
+    UI.drawLogAreaBorder(gameGrid)
+    Log.draw(gameGrid, UI.logArea)
+    
     -- Draw title section using TitleSection module
     TitleSection.draw(gameGrid, UI.titleArea)
-    
-    -- Draw Log content using Log module
-    Log.draw(gameGrid, UI.logArea)
     
     -- Draw info panel content
     UI.drawInfoPanel(gameGrid, player)
@@ -184,7 +185,7 @@ function UI.drawUIPanelBorder(gameGrid)
         end
     end
     
-    -- Separator between title and log areas
+    -- Separator between title and info areas
     local titleSepY = UI.titleArea.y + UI.titleArea.height + 1
     for x = uiX, uiX + uiW - 1 do
         if titleSepY <= #gameGrid and x <= #gameGrid[titleSepY] then
@@ -196,11 +197,31 @@ function UI.drawUIPanelBorder(gameGrid)
         end
     end
     
-    -- Separator between log and info areas
-    local logInfoSepY = UI.logArea.y + UI.logArea.height + 1
+    -- Separator above controls area (aligned with log area)
+    local controlsSepY = UI.controlsArea.y - 1
     for x = uiX, uiX + uiW - 1 do
-        if logInfoSepY <= #gameGrid and x <= #gameGrid[logInfoSepY] then
-            gameGrid[logInfoSepY][x] = {
+        if controlsSepY <= #gameGrid and x <= #gameGrid[controlsSepY] then
+            gameGrid[controlsSepY][x] = {
+                char = BORDER_CHARS.horizontal,
+                color = {0.7, 0.7, 0.7},
+                walkable = false
+            }
+        end
+    end
+end
+
+-- Draw border around the log area at the bottom
+function UI.drawLogAreaBorder(gameGrid)
+    local logX = UI.logArea.x
+    local logY = UI.logArea.y
+    local logW = UI.logArea.width
+    local logH = UI.logArea.height
+    
+    -- Top border of log area
+    local topY = logY - 1
+    for x = logX - 1, logX + logW do
+        if topY <= #gameGrid and x <= #gameGrid[topY] and x >= 1 then
+            gameGrid[topY][x] = {
                 char = BORDER_CHARS.horizontal,
                 color = {0.7, 0.7, 0.7},
                 walkable = false
@@ -208,12 +229,54 @@ function UI.drawUIPanelBorder(gameGrid)
         end
     end
     
-    -- Separator between info and controls areas
-    local infoControlsSepY = UI.infoArea.y + UI.infoArea.height + 1
-    for x = uiX, uiX + uiW - 1 do
-        if infoControlsSepY <= #gameGrid and x <= #gameGrid[infoControlsSepY] then
-            gameGrid[infoControlsSepY][x] = {
+    -- Bottom border of log area
+    local bottomY = logY + logH
+    for x = logX - 1, logX + logW do
+        if bottomY <= #gameGrid and x <= #gameGrid[bottomY] and x >= 1 then
+            gameGrid[bottomY][x] = {
                 char = BORDER_CHARS.horizontal,
+                color = {0.7, 0.7, 0.7},
+                walkable = false
+            }
+        end
+    end
+    
+    -- Left border of log area
+    local leftX = logX - 1
+    for y = logY - 1, logY + logH do
+        if y <= #gameGrid and leftX <= #gameGrid[y] and leftX >= 1 then
+            gameGrid[y][leftX] = {
+                char = BORDER_CHARS.vertical,
+                color = {0.7, 0.7, 0.7},
+                walkable = false
+            }
+        end
+    end
+    
+    -- Right border of log area (connects to game area border)
+    local rightX = logX + logW
+    for y = logY - 1, logY + logH do
+        if y <= #gameGrid and rightX <= #gameGrid[y] then
+            gameGrid[y][rightX] = {
+                char = BORDER_CHARS.vertical,
+                color = {0.7, 0.7, 0.7},
+                walkable = false
+            }
+        end
+    end
+    
+    -- Corners
+    local corners = {
+        {x = leftX, y = topY, char = BORDER_CHARS.corner_tl},
+        {x = rightX, y = topY, char = BORDER_CHARS.corner_tr},
+        {x = leftX, y = bottomY, char = BORDER_CHARS.corner_bl},
+        {x = rightX, y = bottomY, char = BORDER_CHARS.corner_br}
+    }
+    
+    for _, corner in ipairs(corners) do
+        if corner.y <= #gameGrid and corner.x <= #gameGrid[corner.y] and corner.x >= 1 then
+            gameGrid[corner.y][corner.x] = {
+                char = corner.char,
                 color = {0.7, 0.7, 0.7},
                 walkable = false
             }

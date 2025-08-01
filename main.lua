@@ -111,6 +111,9 @@ function love.keypressed(key)
 end
 
 function startNewGame()
+    -- Clear any previous log messages
+    Log.clear()
+    
     -- Clear menu background before starting game
     Menu.clearBackground()
     
