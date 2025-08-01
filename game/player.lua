@@ -4,6 +4,7 @@ local Player = {}
 -- Import colors and config manager
 local Colors = require("Colors")
 local ConfigManager = require("game.configManager")
+local InventoryController = require("game.inventoryController")
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
@@ -25,7 +26,7 @@ function Player.new(x, y, health)
         color = Colors.palette[color] or Colors.palette.player -- Resolve string to color value
     end
     
-    return {
+    local instance = {
         x = x,
         y = y,
         char = ConfigManager.PLAYER.char or "@",
@@ -33,8 +34,15 @@ function Player.new(x, y, health)
         health = playerHealth,
         maxHealth = playerHealth,
         walkable = true,
-        baseAttackDamage = ConfigManager.PLAYER.baseAttackDamage
+        baseAttackDamage = ConfigManager.PLAYER.baseAttackDamage,
+        inventory = InventoryController.new()
     }
+
+    if ConfigManager.PLAYER.weapon then
+        instance.inventory:addItem(ConfigManager.PLAYER.weapon)
+    end
+
+    return instance
 end
 
 -- Damage the player (reduce health)

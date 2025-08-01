@@ -12,9 +12,9 @@ function ItemManager.init()
     end
 end
 
-function ItemManager.getItem(key)
+function ItemManager.new(key)
     if itemDefinitions[key] == nil then Log.error("item: " .. key .. " is not defined") end
-    return itemDefinitions[key]
+    return CloneUtil.clone(itemDefinitions[key])
 end
 
 return ItemManager

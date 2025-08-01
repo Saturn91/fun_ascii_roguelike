@@ -8,11 +8,6 @@ function Weapon.new(config)
     if not config then error("Weapon config is required") end
     local weapon = setmetatable(Item.new(config), Weapon)
 
-    -- Add weapon-specific properties here in the future
-    -- weapon.damage = config.damage
-    -- weapon.attackSpeed = config.attackSpeed
-    -- weapon.range = config.range
-    
     return weapon
 end
 
@@ -52,6 +47,13 @@ function Weapon.validate(weapon)
     end
 
     return true
+end
+
+function Weapon:uiInfo()
+    return {
+        "Damage: " .. self.damage,
+        "Range: " .. self.range
+    }
 end
 
 return Weapon
