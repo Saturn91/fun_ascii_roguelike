@@ -2,11 +2,16 @@
 -- Handles tabbed interface in the info area
 local TabSystem = {}
 
+-- Import tab modules
+local PlayerTab = require("game.ui.tabs.playerTab")
+local InventoryTab = require("game.ui.tabs.inventoryTab")
+local StatsTab = require("game.ui.tabs.statsTab")
+
 -- Tab definitions
 local TABS = {
-    {id = "player", name = "Player", key = "p", number = "1"},
-    {id = "inventory", name = "Inventory", key = "i", number = "2"},
-    {id = "stats", name = "Stats", key = "s", number = "3"}
+    {id = "player", name = "Player", key = "p", number = "1", module = PlayerTab},
+    {id = "inventory", name = "Inventory", key = "i", number = "2", module = InventoryTab},
+    {id = "stats", name = "Stats", key = "s", number = "3", module = StatsTab}
 }
 
 -- Current active tab (default to player)
@@ -89,76 +94,9 @@ end
 function TabSystem.drawTabContent(gameGrid, area, player)
     local tab = TABS[currentTab]
     
-    if tab.id == "player" then
-        TabSystem.drawPlayerTab(gameGrid, area, player)
-    elseif tab.id == "inventory" then
-        TabSystem.drawInventoryTab(gameGrid, area, player)
-    elseif tab.id == "stats" then
-        TabSystem.drawStatsTab(gameGrid, area, player)
-    end
-end
-
--- Draw Player tab content
-function TabSystem.drawPlayerTab(gameGrid, area, player)
-    local lines = {
-        string.format("Player: %s", player.char or "@"),
-        string.format("Pos: (%d,%d)", player.x or 0, player.y or 0),
-        string.format("HP: %d/%d", player.health or 0, player.maxHealth or 0),
-        string.format("Damage: %d", player.baseAttackDamage or 0),
-        "",
-        "Weapon: None",  -- TODO: Add weapon info when implemented
-        "Status: Alive"
-    }
-    
-    TabSystem.drawLines(gameGrid, area, lines, {0.8, 0.8, 1})
-end
-
--- Draw Inventory tab content
-function TabSystem.drawInventoryTab(gameGrid, area, player)
-    local lines = {
-        "INVENTORY",
-        "",
-        "Weapons:",
-        "  None equipped",
-        "",
-        "Items:",
-        "  Empty"
-    }
-    
-    TabSystem.drawLines(gameGrid, area, lines, {0.8, 1, 0.8})
-end
-
--- Draw Stats tab content
-function TabSystem.drawStatsTab(gameGrid, area, player)
-    local lines = {
-        "STATISTICS",
-        "",
-        string.format("Enemies: %d", player.enemiesKilled or 0),
-        string.format("Rooms: %d", player.roomsVisited or 1),
-        string.format("Steps: %d", player.stepsTaken or 0),
-        "",
-        "Time: 00:00"  -- TODO: Add game time tracking
-    }
-    
-    TabSystem.drawLines(gameGrid, area, lines, {1, 0.8, 0.8})
-end
-
--- Helper function to draw lines of text
-function TabSystem.drawLines(gameGrid, area, lines, color)
-    for i, line in ipairs(lines) do
-        local y = area.y + i - 1
-        if y <= area.y + area.height - 1 then
-            for j = 1, math.min(#line, area.width) do
-                local x = area.x + j - 1
-                if y <= #gameGrid and x <= #gameGrid[y] then
-                    gameGrid[y][x] = {
-                        char = line:sub(j, j),
-                        color = color,
-                        walkable = false
-                    }
-                end
-            end
-        end
+    -- Use the tab's module to draw content
+    if tab.module then
+        tab.module.draw(gameGrid, area, player)
     end
 end
 

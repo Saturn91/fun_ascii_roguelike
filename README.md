@@ -4,7 +4,17 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 
 ## Features
 
-- ✅ **Player-Editable Configurations** - Customize game balance via CSV files in appdata
+- ✅ **Player-Editable Configurations** - Customize game balance via C   ├── ui.lua            # Main UI controller
+   └── ui/
+       ├── titleSection.lua   # Game title and info
+       ├── tabSystem.lua      # Tab navigation system
+       ├── tabs/              # Individual tab modules
+       │   ├── playerTab.lua  # Player information tab
+       │   ├── inventoryTab.lua # Inventory and weapons tab
+       │   └── statsTab.lua   # Game statistics tab
+       ├── Log.lua         # Colored message logging
+       ├── controls.lua       # Control instructions
+       └── healthBar.lua      # ASCII health visualizationes in appdata
 - ✅ **Dynamic Configuration System** - Add new config types without code changes
 - ✅ **Configuration Validation** - Comprehensive error checking with fallback to defaults
 - ✅ **Integrated Font System** - No external font installation needed
