@@ -10,24 +10,18 @@ Log = require("game.ui.Logger")
 -- Import game modules
 local Fonts = require("fonts")
 local AsciiGrid = require("asciiGrid")
-local Room = require("game.room")
-local Player = require("game.player")
-local Enemy = require("game.enemy")
+require("game.__index")
 local UI = require("game.ui")
-local MapGenerator = require("game.mapGenerator")
 local Controls = require("game.controls")
 local Menu = require("menu.menu")
-local GameState = require("game.gameState")
-local PauseMenu = require("menu.pauseMenu")
-local GameOverScreen = require("menu.gameOverScreen")
-local ConfigManager = require("game.configManager")
+
 require("util._index")
 require("sandbox/Sandbox")
 Sandbox.init()
 
 function love.load()
      Log.log("[gold]Welcome human![/gold] Lets get started")
-     
+
     -- Initialize configuration manager first
     ConfigManager.load()
     
