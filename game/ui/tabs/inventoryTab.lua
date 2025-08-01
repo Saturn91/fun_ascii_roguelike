@@ -38,8 +38,15 @@ function InventoryTab.draw(gameGrid, area, player)
         if item then
             table.insert(lines, "")
             table.insert(lines, "SELECTED ITEM:")
-            table.insert(lines, string.format("Char: %s", item.char))
-            table.insert(lines, string.format("Name: %s", item.name))
+            
+            -- Use item's getUIInfo function to display item details
+            local uiInfo = item:getUIInfo()
+            for _, infoGroup in ipairs(uiInfo) do
+                for _, infoLine in ipairs(infoGroup) do
+                    table.insert(lines, infoLine)
+                end
+            end
+            
             table.insert(lines, "")
             -- Show different actions based on item location
             if selectedType == "equipment" then

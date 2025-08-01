@@ -8,6 +8,8 @@ function Weapon.new(config)
     if not config then error("Weapon config is required") end
     local weapon = setmetatable(Item.new(config), Weapon)
 
+    weapon.damage = config.damage
+    weapon.range = config.range
     weapon.type = Item.TYPE.weapon
 
     return weapon
@@ -51,11 +53,14 @@ function Weapon.validate(weapon)
     return true
 end
 
-function Weapon:uiInfo()
-    return {
+function Weapon:getUIInfo()
+    local summary = {}
+    table.insert(summary, Item.getUIInfo(self))
+    table.insert(summary,{
         "Damage: " .. self.damage,
         "Range: " .. self.range
-    }
+    })
+    return summary
 end
 
 return Weapon

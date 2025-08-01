@@ -73,49 +73,10 @@ function Item.validate(config)
     return Item.configs[config.type].validate(config)
 end
 
--- Get item display string (character + name)
-function Item:getDisplayString()
-    return string.format("%s %s", self.char, self.name)
-end
-
--- Get item character only
-function Item:getChar()
-    return self.char
-end
-
--- Get item name
-function Item:getName()
-    return self.name
-end
-
--- Get item ID
-function Item:getId()
-    return self.id
-end
-
--- Get item color
-function Item:getColor()
-    return self.color
-end
-
--- Get item type
-function Item:getType()
-    return self.type
-end
-
--- Get item description
-function Item:getDescription()
-    return self.description or "No description available"
-end
-
--- Check if item is of a specific type
-function Item:isType(itemType)
-    return self.type == itemType
-end
-
--- String representation for debugging
-function Item:__tostring()
-    return string.format("Item[%s]: %s (%s)", self.id, self.name, self.type)
+function Item:getUIInfo()
+    return {
+        "Name: " .. self.name,
+    }
 end
 
 return Item
