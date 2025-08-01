@@ -6,29 +6,6 @@ local InventoryTab = {}
 local selectedSlot = nil
 local selectedType = nil  -- "equipment" or "backpack"
 
--- Mock inventory data for demonstration
-local mockInventory = {
-    equipment = {
-        r = nil,  -- right hand
-        l = nil,  -- left hand
-        h = nil,  -- head
-        b = nil,  -- body
-        f = nil   -- legs
-    },
-    backpack = {
-        [1] = {char = "S", name = "Iron Sword", damage = "2d6+1", type = "weapon"},
-        [2] = {char = "P", name = "Health Potion", effect = "Heal 10 HP", type = "consumable"},
-        [3] = nil,
-        [4] = nil,
-        [5] = nil,
-        [6] = nil,
-        [7] = nil,
-        [8] = nil,
-        [9] = nil,
-        [10] = nil  -- slot 0 maps to index 10
-    }
-}
-
 -- Draw Inventory tab content
 function InventoryTab.draw(gameGrid, area, player)
     -- Build inventory display with item characters
@@ -36,39 +13,33 @@ function InventoryTab.draw(gameGrid, area, player)
         "INVENTORY",
         "",
         "Equipment:",
-        string.format("[r] right hand: %s", InventoryTab.getItemDisplay("equipment", "r")),
-        string.format("[l] left hand: %s", InventoryTab.getItemDisplay("equipment", "l")), 
-        string.format("[h] head: %s", InventoryTab.getItemDisplay("equipment", "h")),
-        string.format("[b] body: %s", InventoryTab.getItemDisplay("equipment", "b")),
-        string.format("[f] legs: %s", InventoryTab.getItemDisplay("equipment", "f")),
+        string.format("[r] right hand: %s", InventoryTab.getItemDisplay("equipment", "r", player)),
+        string.format("[l] left hand: %s", InventoryTab.getItemDisplay("equipment", "l", player)), 
+        string.format("[h] head: %s", InventoryTab.getItemDisplay("equipment", "h", player)),
+        string.format("[b] body: %s", InventoryTab.getItemDisplay("equipment", "b", player)),
+        string.format("[f] legs: %s", InventoryTab.getItemDisplay("equipment", "f", player)),
         "",
         "Backpack:",
-        string.format("[1] %s", InventoryTab.getItemDisplay("backpack", 1)),
-        string.format("[2] %s", InventoryTab.getItemDisplay("backpack", 2)),
-        string.format("[3] %s", InventoryTab.getItemDisplay("backpack", 3)),
-        string.format("[4] %s", InventoryTab.getItemDisplay("backpack", 4)),
-        string.format("[5] %s", InventoryTab.getItemDisplay("backpack", 5)),
-        string.format("[6] %s", InventoryTab.getItemDisplay("backpack", 6)),
-        string.format("[7] %s", InventoryTab.getItemDisplay("backpack", 7)),
-        string.format("[8] %s", InventoryTab.getItemDisplay("backpack", 8)),
-        string.format("[9] %s", InventoryTab.getItemDisplay("backpack", 9)),
-        string.format("[0] %s", InventoryTab.getItemDisplay("backpack", 10))
+        string.format("[1] %s", InventoryTab.getItemDisplay("backpack", 1, player)),
+        string.format("[2] %s", InventoryTab.getItemDisplay("backpack", 2, player)),
+        string.format("[3] %s", InventoryTab.getItemDisplay("backpack", 3, player)),
+        string.format("[4] %s", InventoryTab.getItemDisplay("backpack", 4, player)),
+        string.format("[5] %s", InventoryTab.getItemDisplay("backpack", 5, player)),
+        string.format("[6] %s", InventoryTab.getItemDisplay("backpack", 6, player)),
+        string.format("[7] %s", InventoryTab.getItemDisplay("backpack", 7, player)),
+        string.format("[8] %s", InventoryTab.getItemDisplay("backpack", 8, player)),
+        string.format("[9] %s", InventoryTab.getItemDisplay("backpack", 9, player)),
+        string.format("[0] %s", InventoryTab.getItemDisplay("backpack", 10, player))
     }
     
     -- Add item details if something is selected
     if selectedSlot and selectedType then
-        local item = InventoryTab.getSelectedItem()
+        local item = InventoryTab.getSelectedItem(player)
         if item then
             table.insert(lines, "")
             table.insert(lines, "SELECTED ITEM:")
+            table.insert(lines, string.format("Char: %s", item.char))
             table.insert(lines, string.format("Name: %s", item.name))
-            if item.damage then
-                table.insert(lines, string.format("Damage: %s", item.damage))
-            end
-            if item.effect then
-                table.insert(lines, string.format("Effect: %s", item.effect))
-            end
-            table.insert(lines, string.format("Type: %s", item.type))
             table.insert(lines, "")
             table.insert(lines, "Actions: [E]quip [D]rop [U]se")
         else
@@ -85,42 +56,42 @@ function InventoryTab.draw(gameGrid, area, player)
 end
 
 -- Get item character for display (or - if empty)
-function InventoryTab.getItemChar(inventoryType, slot)
+function InventoryTab.getItemChar(inventoryType, slot, player)
     if inventoryType == "equipment" then
-        local item = mockInventory.equipment[slot]
+        local item = player.inventory.equipment[slot]
         return item and item.char or "-"
     elseif inventoryType == "backpack" then
         local index = slot == 0 and 10 or slot
-        local item = mockInventory.backpack[index]
+        local item = player.inventory.backpack[index]
         return item and item.char or "-"
     end
     return "-"
 end
 
 -- Get item display string (character + name or just - if empty)
-function InventoryTab.getItemDisplay(inventoryType, slot)
+function InventoryTab.getItemDisplay(inventoryType, slot, player)
     if inventoryType == "equipment" then
-        local item = mockInventory.equipment[slot]
+        local item = player.inventory.equipment[slot]
         return item and string.format("%s %s", item.char, item.name) or "-"
     elseif inventoryType == "backpack" then
         local index = slot == 0 and 10 or slot
-        local item = mockInventory.backpack[index]
+        local item = player.inventory.backpack[index]
         return item and string.format("%s %s", item.char, item.name) or "-"
     end
     return "-"
 end
 
 -- Get currently selected item
-function InventoryTab.getSelectedItem()
+function InventoryTab.getSelectedItem(player)
     if not selectedSlot or not selectedType then
         return nil
     end
     
     if selectedType == "equipment" then
-        return mockInventory.equipment[selectedSlot]
+        return player.inventory.equipment[selectedSlot]
     elseif selectedType == "backpack" then
         local index = selectedSlot == 0 and 10 or selectedSlot
-        return mockInventory.backpack[index]
+        return player.inventory.backpack[index]
     end
     
     return nil
@@ -207,13 +178,13 @@ function InventoryTab.updateOnKeypressed(key, player, gameGrid)
     -- Action keys when item is selected
     if selectedSlot and selectedType then
         if key == "e" then
-            InventoryTab.equipItem()
+            InventoryTab.equipItem(player)
             return true
         elseif key == "d" then
-            InventoryTab.dropItem()
+            InventoryTab.dropItem(player)
             return true
         elseif key == "u" then
-            InventoryTab.useItem()
+            InventoryTab.useItem(player)
             return true
         end
     end
@@ -242,8 +213,8 @@ function InventoryTab.selectBackpackSlot(slotNumber, key, player)
 end
 
 -- Handle item actions
-function InventoryTab.equipItem()
-    local item = InventoryTab.getSelectedItem()
+function InventoryTab.equipItem(player)
+    local item = InventoryTab.getSelectedItem(player)
     if item then
         if Log then
             Log.log(string.format("[info]Equipping %s[/info]", item.name))
@@ -252,8 +223,8 @@ function InventoryTab.equipItem()
     end
 end
 
-function InventoryTab.dropItem()
-    local item = InventoryTab.getSelectedItem()
+function InventoryTab.dropItem(player)
+    local item = InventoryTab.getSelectedItem(player)
     if item then
         if Log then
             Log.log(string.format("[info]Dropping %s[/info]", item.name))
@@ -262,8 +233,8 @@ function InventoryTab.dropItem()
     end
 end
 
-function InventoryTab.useItem()
-    local item = InventoryTab.getSelectedItem()
+function InventoryTab.useItem(player)
+    local item = InventoryTab.getSelectedItem(player)
     if item then
         if Log then
             Log.log(string.format("[info]Using %s[/info]", item.name))

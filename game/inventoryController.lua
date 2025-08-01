@@ -50,7 +50,6 @@ function InventoryController:addItem(item)
     for i = 1, 10 do
         if self.backpack[i] == nil then
             self.backpack[i] = _item
-            Log.log("added item: " .. json.stringify(_item, true) .. " to slot " .. i)
             return i
         end
     end
