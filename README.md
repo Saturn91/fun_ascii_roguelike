@@ -375,11 +375,13 @@ fun_ascii_roguelike/
 │   ├── pauseMenu.lua     # In-game pause menu system
 │   ├── gameOverScreen.lua # Game over screen with statistics
 │   └── backgroundMap.lua # Animated background world for menus
+├── tests/                # Unit testing framework and test files
 ├── game/
 │   ├── configManager.lua # Dynamic configuration management system
 │   ├── config/           # Default configuration modules
 │   │   ├── player.lua    # Default player configuration with validation
 │   │   └── enemy.lua     # Default enemy configurations with validation
+│   ├── dice.lua          # Dice rolling system with formula parsing
 │   ├── room.lua          # Room system and player placement
 │   ├── mapGenerator.lua  # Procedural dungeon generation
 │   ├── player.lua        # Player creation, movement, and combat
@@ -525,6 +527,46 @@ The pause menu system uses a **hybrid rendering approach**:
 - **Resizable window**: Enabled for flexible gameplay
 - **Console**: Disabled for release builds
 - **High DPI**: Supported for modern displays
+
+## Testing
+
+The project includes a comprehensive unit testing framework to ensure code quality and functionality.
+
+### Test Structure
+
+- **Test Framework**: Custom Lua unit testing library located in `tests/unitTestLib/`
+- **Test Files**: Individual test modules in `tests/unittests/tests/` covering core game functionality
+- **Automated Testing**: Pre-commit hooks ensure tests pass before code changes
+
+### Running Tests
+
+To run the complete test suite:
+
+```bash
+lua tests/unitTestLib/main.lua
+```
+
+**Requirements**: Standard Lua interpreter (Love2D not required for tests)
+
+### Test Coverage
+
+The test suite includes comprehensive testing for:
+
+- **Dice System**: Formula parsing, validation, and random roll range testing
+- **Game Mechanics**: Various core game systems and utilities
+- **Configuration Management**: Validation and error handling
+- **Data Structures**: Array utilities and game logic components
+
+### Test Features
+
+- **Automated Test Discovery**: Tests are automatically found and executed
+- **Detailed Reporting**: Clear pass/fail status with descriptive error messages  
+- **Modular Design**: Easy to add new test files for additional functionality
+- **Mock Systems**: Controlled testing environments for randomized components
+
+### Pre-commit Testing
+
+The repository includes Git pre-commit hooks that automatically run the test suite before allowing commits, ensuring code quality and preventing regressions.
 
 ## Contributing
 
