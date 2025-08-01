@@ -165,8 +165,9 @@ local function loadConfig(configKey)
     local configFile = getConfigFilePath(configDef.csvName)
     
     local info = love.filesystem.getInfo(configFile)
+    local fileExists = info ~= nil
     
-    if info then
+    if fileExists then
         -- File exists, load it
         local content = love.filesystem.read(configFile)
         if content then
@@ -178,14 +179,23 @@ local function loadConfig(configKey)
                     ConfigManager[configKey] = config
                     return true
                 else
-                    -- Validation failed, log error and use default
+                    -- Validation failed, log error and use default but DON'T overwrite file
                     Log.log("[error]" .. configKey:lower() .. " config validation failed for " .. configFile .. ": " .. validationResult .. "[/error]")
+                    Log.log("[warning]Using default " .. configKey:lower() .. " config. Fix the file to use custom settings.[/warning]")
                 end
+            else
+                -- Failed to parse CSV, use default but DON'T overwrite file
+                Log.log("[error]Failed to parse " .. configFile .. " as valid CSV[/error]")
+                Log.log("[warning]Using default " .. configKey:lower() .. " config. Fix the file to use custom settings.[/warning]")
             end
+        else
+            -- Failed to read file content, use default but DON'T overwrite file
+            Log.log("[error]Failed to read " .. configFile .. "[/error]")
+            Log.log("[warning]Using default " .. configKey:lower() .. " config. Fix the file to use custom settings.[/warning]")
         end
     end
     
-    -- File doesn't exist, failed to load, or validation failed - use default
+    -- File doesn't exist OR validation/parsing failed - use default
     ConfigManager[configKey] = {}
     for key, value in pairs(defaultConfig) do
         if type(value) ~= "function" then -- Skip any functions (like validate)
@@ -202,31 +212,42 @@ local function loadConfig(configKey)
         end
     end
     
-    -- Create the config directory if it doesn't exist
-    LocalFileUtil.createPathDirectoryIfNotExists(configFile)
+    -- Only create/save the default config file if it doesn't exist
+    if not fileExists then
+        -- Create the config directory if it doesn't exist
+        LocalFileUtil.createPathDirectoryIfNotExists(configFile)
+        
+        -- Save default config
+        local csvContent = tableToCSV(ConfigManager[configKey], configDef.isArray, configDef.idField)
+        LocalFileUtil.writeFile(configFile, csvContent)
+    end
     
-    -- Save default config
-    local csvContent = tableToCSV(ConfigManager[configKey], configDef.isArray, configDef.idField)
-    LocalFileUtil.writeFile(configFile, csvContent)
-    
-    return false
+    return fileExists -- Return true if file existed (even if validation failed), false if created new
 end
 
 -- Initialize/reinitialize configuration loading
 function ConfigManager.load()
     local allLoaded = true
+    local createdFiles = false
     
     for configKey, _ in pairs(configs) do
         local loaded = loadConfig(configKey)
-        if not loaded then
+        if loaded then
+            -- File existed (regardless of validation success)
+            -- allLoaded remains true only if validation succeeded
+        else
+            -- File didn't exist, created default
             allLoaded = false
+            createdFiles = true
         end
     end
     
     if allLoaded then
-        Log.log("[info]Configs read from files[/info]")
+        Log.log("[info]All configs loaded successfully from files[/info]")
+    elseif createdFiles then
+        Log.log("[info]Some config files created with defaults[/info]")
     else
-        Log.log("[info]Created files[/info]")
+        Log.log("[warning]Some configs using defaults due to validation errors[/warning]")
     end
 end
 

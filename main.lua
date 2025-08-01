@@ -1,6 +1,9 @@
 -- ASCII Roguelike using Love2D
 -- Main game file
 
+-- Global version constant
+VERSION = "1.0.0"
+
 -- global imports
 Log = require("game.ui.Logger")
 

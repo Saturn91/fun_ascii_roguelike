@@ -19,12 +19,6 @@ local menuOptions = {
 function Menu.init()
     selectedOption = 2  -- Start on "New Game" instead of "Continue"
     BackgroundMap.init()
-    
-    -- Add some welcome messages to the logger
-    Log.clear()  -- Clear any existing messages
-    Log.log("[gold]Welcome to ASCII Roguelike![/gold]")
-    Log.log("[info]Select 'New Game' to start your adventure[/info]")
-    Log.log("[warning]Beware of the dangers that await![/warning]")
 end
 
 -- Draw the menu to the ASCII grid
@@ -112,6 +106,21 @@ function Menu.draw(gameGrid, gridWidth, gridHeight, dt)
     
     -- Draw logger at the bottom
     Log.draw(gameGrid, logArea)
+    
+    -- Draw version in the lower left corner
+    local versionText = "v" .. VERSION
+    local versionY = gridHeight - 1
+    local versionX = 2  -- Position in lower left corner
+    
+    if versionY > 0 and versionX > 0 then
+        for i = 1, string.len(versionText) do
+            local char = string.sub(versionText, i, i)
+            local x = versionX + i - 1
+            if x > 0 and x <= gridWidth and gameGrid[versionY] and gameGrid[versionY][x] then
+                gameGrid[versionY][x] = {char = char, color = Colors.palette.lightgray, walkable = false}
+            end
+        end
+    end
     
     -- Draw "made by saturn91.dev" credit on the right side
     local creditText = "made by saturn91.dev"

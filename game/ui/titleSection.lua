@@ -1,26 +1,29 @@
 -- Title section module for ASCII Roguelike UI
 local TitleSection = {}
 
+-- Import Colors module
+local Colors = require("Colors")
+
 -- Draw the title section content
 function TitleSection.draw(gameGrid, titleArea)
     local titleLines = {
         "",
         "ASCII ROGUELIKE",
         "---------------",
-        "Version: 1.0.0",
+        "Version: " .. VERSION,
         "",
         "Made by:",
         "Saturn91.dev"
     }
     
     local colors = {
-        {0.9, 0.9, 0.9},  -- White for empty line
-        {1, 0.8, 0.2},    -- Gold for title
-        {0.7, 0.7, 0.7},  -- Gray for underline
-        {0.6, 0.8, 1},    -- Light blue for version
-        {0.9, 0.9, 0.9},  -- White for empty line
-        {0.9, 0.9, 0.9},  -- White for "Made by:"
-        {0.8, 1, 0.8}     -- Light green for author
+        Colors.palette.text,
+        Colors.palette.gold,
+        Colors.palette.lightgray,
+        Colors.palette.info,
+        Colors.palette.text,
+        Colors.palette.text,
+        Colors.palette.heal
     }
     
     for i, line in ipairs(titleLines) do
@@ -32,7 +35,7 @@ function TitleSection.draw(gameGrid, titleArea)
             for j = 1, math.min(#line, titleArea.width) do
                 local x = startX + j - 1
                 if y <= #gameGrid and x <= #gameGrid[y] then
-                    local color = colors[i] or {0.9, 0.9, 0.9}  -- Default to white if color not defined
+                    local color = colors[i] or Colors.palette.text  -- Default to text color if not defined
                     
                     gameGrid[y][x] = {
                         char = line:sub(j, j),
