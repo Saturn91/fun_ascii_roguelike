@@ -2,7 +2,7 @@
 -- Main game file
 
 -- global imports
-Logger = require("game.ui.logger")
+Log = require("game.ui.Logger")
 
 -- Import game modules
 local Fonts = require("fonts")
@@ -134,8 +134,8 @@ function startNewGame()
     Enemy.spawnRandom(gameGrid, gameAreaWidth, gameAreaHeight, 2, "skeleton")
     
     -- Add welcome messages with color markup
-    Logger.log("[gold]Welcome to ASCII Roguelike![/gold]")
-    Logger.log("[warning]Enemies have appeared![/warning]")
+    Log.log("[gold]Welcome to ASCII Roguelike![/gold]")
+    Log.log("[warning]Enemies have appeared![/warning]")
     
     -- Initialize game statistics
     Controls.initGameStats()

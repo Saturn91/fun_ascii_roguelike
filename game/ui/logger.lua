@@ -1,15 +1,15 @@
--- Logger module for ASCII Roguelike UI
-local Logger = {}
+-- Log module for ASCII Roguelike UI
+local Log = {}
 
 -- Import Colors module for markup parsing
 local Colors = require("Colors")
 
--- Logger configuration
+-- Log configuration
 local MAX_LOG_MESSAGES = 21
 local logMessages = {}
 
--- Logger function to replace print statements
-function Logger.log(message)
+-- Log function to replace print statements
+function Log.log(message)
     local timestamp = SaveOs.date("%H:%M:%S")
     local logEntry = string.format("[%s] %s", timestamp, tostring(message))
     print(logEntry)
@@ -21,12 +21,12 @@ function Logger.log(message)
     end
 end
 
-function Logger.error(message)
-    Logger.log("[red]-->err:" .. message .. "[/red]")
+function Log.error(message)
+    Log.log("[red]-->err:" .. message .. "[/red]")
 end
 
 -- Wrap colored text segments to fit within specified width
-function Logger.wrapColoredText(segments, maxWidth)
+function Log.wrapColoredText(segments, maxWidth)
     local lines = {}
     local currentLine = {}
     local currentLength = 0
@@ -66,7 +66,7 @@ function Logger.wrapColoredText(segments, maxWidth)
 end
 
 -- Original wrap function for backward compatibility
-function Logger.wrapText(text, maxWidth)
+function Log.wrapText(text, maxWidth)
     local lines = {}
     local currentLine = ""
     
@@ -92,8 +92,8 @@ function Logger.wrapText(text, maxWidth)
     return lines
 end
 
--- Draw the logger content
-function Logger.draw(gameGrid, logArea)
+-- Draw the Log content
+function Log.draw(gameGrid, logArea)
     -- Draw "LOG" title
     local titleY = logArea.y - 1
     local titleText = "LOG"
@@ -128,7 +128,7 @@ function Logger.draw(gameGrid, logArea)
         local segments = Colors.parseMarkup(message, Colors.palette.text)
         
         -- Wrap the colored segments
-        local wrappedLines = Logger.wrapColoredText(segments, logArea.width)
+        local wrappedLines = Log.wrapColoredText(segments, logArea.width)
         
         for lineIdx, coloredLine in ipairs(wrappedLines) do
             if currentY > logArea.y + logArea.height - 1 then
@@ -154,4 +154,4 @@ function Logger.draw(gameGrid, logArea)
     end
 end
 
-return Logger
+return Log

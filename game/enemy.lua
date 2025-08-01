@@ -141,7 +141,7 @@ end
 -- Enemy attacks the player
 function Enemy.attackPlayer(enemy, player)
     Player.takeDamage(player, enemy.damage)
-    Logger.log(string.format("[red]%s[/red] attacks [gold]@[/gold] for [damage]%d damage[/damage]!", 
+    Log.log(string.format("[red]%s[/red] attacks [gold]@[/gold] for [damage]%d damage[/damage]!", 
         enemy.name, enemy.damage))
 end
 
@@ -149,14 +149,14 @@ end
 function Enemy.takeDamage(enemy, damage, gameGrid)
     enemy.health = math.max(0, enemy.health - damage)
     
-    Logger.log(string.format("[gold]@[/gold] attacks [red]%s[/red] for [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
+    Log.log(string.format("[gold]@[/gold] attacks [red]%s[/red] for [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
         enemy.name, damage, enemy.health, enemy.maxHealth))
     
     if enemy.health <= 0 then
-        Logger.log(string.format("[success]%s defeated![/success]", enemy.name))
+        Log.log(string.format("[success]%s defeated![/success]", enemy.name))
         -- Increment kill count
         killCount = killCount + 1
-        Logger.log(string.format("[info]Enemies defeated: %d[/info]", killCount))
+        Log.log(string.format("[info]Enemies defeated: %d[/info]", killCount))
         -- Remove enemy from grid
         gameGrid[enemy.y][enemy.x] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
         -- Remove from enemies list

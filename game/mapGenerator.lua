@@ -57,7 +57,7 @@ function MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, amount, min
     end
     
     -- Log generation statistics
-    if Logger then
+    if Log then
         if #rooms < amount then
             local reason = ""
             if attempts >= maxAttempts then
@@ -66,12 +66,12 @@ function MapGenerator.generateRooms(gameGrid, gridWidth, gridHeight, amount, min
                 reason = "map full"
             end
             
-            Logger.log(string.format("[warning]Generated %d/%d rooms (%s)[/warning]", 
+            Log.log(string.format("[warning]Generated %d/%d rooms (%s)[/warning]", 
                 #rooms, amount, reason))
-            Logger.log(string.format("[info]Attempts: %d, Failures: %d[/info]", 
+            Log.log(string.format("[info]Attempts: %d, Failures: %d[/info]", 
                 attempts, consecutiveFailures))
         else
-            Logger.log(string.format("[success]Generated %d rooms /%d[/success]", 
+            Log.log(string.format("[success]Generated %d rooms /%d[/success]", 
                 #rooms, attempts))
         end
     end
@@ -285,8 +285,8 @@ function MapGenerator.generateMap(gameGrid, gridWidth, gridHeight, options)
     end
     
     -- Log generation results
-    if Logger then
-        Logger.log(string.format("[info]Map: %d rooms[/info]", #rooms))
+    if Log then
+        Log.log(string.format("[info]Map: %d rooms[/info]", #rooms))
     end
     
     return rooms

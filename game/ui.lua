@@ -1,10 +1,9 @@
 -- UI module for ASCII Roguelike
--- Handles all user interface elements including logger
+-- Handles all user interface elements including Log
 local UI = {}
 
 -- Import UI sub-modules
 local TitleSection = require("game.ui.titleSection")
-local Logger = require("game.ui.logger")
 local HealthBar = require("game.ui.healthBar")
 local Controls = require("game.ui.controls")
 
@@ -53,7 +52,7 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         height = 8  -- Space for title, version, and author
     }
     
-    -- Logger area (moved down to make room for title)
+    -- Log area (moved down to make room for title)
     UI.logArea = {
         x = UI.uiArea.x + 1,
         y = UI.titleArea.y + UI.titleArea.height + 2,  -- Position after title area + border
@@ -101,8 +100,8 @@ function UI.draw(gameGrid, player)
     -- Draw title section using TitleSection module
     TitleSection.draw(gameGrid, UI.titleArea)
     
-    -- Draw logger content using Logger module
-    Logger.draw(gameGrid, UI.logArea)
+    -- Draw Log content using Log module
+    Log.draw(gameGrid, UI.logArea)
     
     -- Draw info panel content
     UI.drawInfoPanel(gameGrid, player)

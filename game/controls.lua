@@ -6,7 +6,6 @@ local Controls = {}
 local Player = require("game.player")
 local Enemy = require("game.enemy")
 local UI = require("game.ui")
-local Logger = require("game.ui.logger")
 local GameState = require("game.gameState")
 local PauseMenu = require("menu.pauseMenu")
 local GameOverScreen = require("menu.gameOverScreen")
@@ -32,7 +31,7 @@ function Controls.handlePlayingInput(key, player, gameGrid)
     if key == "escape" then
         GameState.setState(GameState.STATES.PAUSED)
         PauseMenu.init()
-        Logger.log("[info]Game paused[/info]")
+        Log.log("[info]Game paused[/info]")
         return
     end
     
@@ -61,8 +60,8 @@ function Controls.handlePlayingInput(key, player, gameGrid)
         
         -- Check victory condition
         if Enemy.getTotalCount() == 0 then
-            Logger.log("[success]Victory! All enemies defeated![/success]")
-            Logger.log("[info]Press Escape to quit[/info]")
+            Log.log("[success]Victory! All enemies defeated![/success]")
+            Log.log("[info]Press Escape to quit[/info]")
         end
     end
 end
@@ -73,15 +72,15 @@ function Controls.handlePauseInput(key)
     
     if action == "resume" then
         GameState.setState(GameState.STATES.PLAYING)
-        Logger.log("[info]Game resumed[/info]")
+        Log.log("[info]Game resumed[/info]")
     elseif action == "new_game" then
         -- Start a new game
         GameState.setState(GameState.STATES.PLAYING)
-        Logger.log("[success]Starting new game![/success]")
+        Log.log("[success]Starting new game![/success]")
         return "new_game"  -- Signal to main.lua to restart
     elseif action == "main_menu" then
         GameState.setState(GameState.STATES.MENU)
-        Logger.log("[info]Returning to main menu[/info]")
+        Log.log("[info]Returning to main menu[/info]")
         return "main_menu"  -- Signal to main.lua to reset
     elseif action == "quit" then
         love.event.quit()
@@ -94,11 +93,11 @@ function Controls.handleGameOverInput(key)
     
     if action == "retry" then
         GameState.setState(GameState.STATES.PLAYING)
-        Logger.log("[success]Starting new game![/success]")
+        Log.log("[success]Starting new game![/success]")
         return "new_game"  -- Signal to main.lua to restart
     elseif action == "main_menu" then
         GameState.setState(GameState.STATES.MENU)
-        Logger.log("[info]Returning to main menu[/info]")
+        Log.log("[info]Returning to main menu[/info]")
         return "main_menu"  -- Signal to main.lua to reset
     elseif action == "quit" then
         love.event.quit()
@@ -116,7 +115,7 @@ function Controls.triggerGameOver(cause)
     
     GameOverScreen.init(stats)
     GameState.setState(GameState.STATES.GAME_OVER)
-    Logger.log("[error]Game Over! Cause: " .. cause .. "[/error]")
+    Log.log("[error]Game Over! Cause: " .. cause .. "[/error]")
 end
 
 -- Initialize game statistics

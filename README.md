@@ -114,7 +114,7 @@ The game features a modular UI with four main components:
 - Game title and author information
 - Centered display with color markup
 
-#### **Logger Panel** (`logger.lua`)
+#### **Log Panel** (`Log.lua`)
 - **Colored message logging** with markup support
 - **Scrolling history** (20 messages maximum)
 - **Timestamped entries** for all game events
@@ -227,7 +227,7 @@ fun_ascii_roguelike/
 │   ├── ui.lua            # Main UI controller
 │   └── ui/
 │       ├── titleSection.lua   # Game title and info
-│       ├── logger.lua         # Colored message logging
+│       ├── Log.lua         # Colored message logging
 │       ├── controls.lua       # Control instructions
 │       └── healthBar.lua      # ASCII health visualization
 └── assets/

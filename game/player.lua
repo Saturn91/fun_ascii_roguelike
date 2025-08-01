@@ -25,14 +25,14 @@ end
 -- Damage the player (reduce health)
 function Player.takeDamage(player, damage)
     player.health = math.max(0, player.health - damage)
-    Logger.log(string.format("[gold]"..player.char.."[/gold] takes [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
+    Log.log(string.format("[gold]"..player.char.."[/gold] takes [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
         damage, player.health, player.maxHealth))
 end
 
 -- Heal the player (restore health)
 function Player.heal(player, amount)
     player.health = math.min(player.maxHealth, player.health + amount)
-    Logger.log(string.format("[gold]"..player.char.."[/gold] heals [heal]%d health[/heal]! ([health]%d[/health]/[health]%d[/health])", 
+    Log.log(string.format("[gold]"..player.char.."[/gold] heals [heal]%d health[/heal]! ([health]%d[/health]/[health]%d[/health])", 
         amount, player.health, player.maxHealth))
 end
 
@@ -86,7 +86,7 @@ function Player.moveTo(player, newX, newY, gameGrid, gridWidth, gridHeight)
             return true -- Movement successful
         else
             -- Player tried to walk into a wall
-            Logger.log("[warning]Bonk![/warning] That's a wall!")
+            Log.log("[warning]Bonk![/warning] That's a wall!")
             return false -- Movement blocked
         end
     end
