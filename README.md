@@ -46,9 +46,7 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 
 ## Controls
 
-- **Arrow Keys** or **WASD**: Move player / Attack enemies (move into them)
-- **H**: Test damage (decreases health)
-- **J**: Test healing (increases health)
+- **Arrow Keys**: Move player / Attack enemies (move into them)
 - **Escape**: Pause game (during gameplay) / Resume game (in pause menu) / Quit game (from main menu)
 
 ### Main Menu Controls

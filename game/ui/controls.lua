@@ -27,17 +27,12 @@ function Controls.draw(gameGrid, controlsArea)
     -- Define control instructions
     local controlLines = {
         "Movement:",
-        "  WASD - Move",
         "  Arrows - Move",
         "",
         "Tabs:",
         "  P - Player",
         "  I - Inventory",
         "  S - Stats",
-        "",
-        "Actions:",
-        "  H - Heal (+1 HP)",
-        "  J - Damage (-1 HP)",
         "",
         "System:",
         "  ESC - Pause Game"

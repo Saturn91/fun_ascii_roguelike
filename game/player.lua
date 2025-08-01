@@ -68,14 +68,14 @@ end
 function Player.handleMovement(player, key, gameGrid, gridWidth, gridHeight)
     local newX, newY = player.x, player.y
     
-    -- Handle player movement input
-    if key == "up" or key == "w" then
+    -- Handle player movement input (arrow keys only)
+    if key == "up" then
         newY = newY - 1
-    elseif key == "down" or key == "s" then
+    elseif key == "down" then
         newY = newY + 1
-    elseif key == "left" or key == "a" then
+    elseif key == "left" then
         newX = newX - 1
-    elseif key == "right" or key == "d" then
+    elseif key == "right" then
         newX = newX + 1
     else
         -- No movement input, return false to indicate no movement
