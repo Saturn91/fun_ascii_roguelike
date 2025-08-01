@@ -97,9 +97,9 @@ function run(test)
     test.assert_equal(nil, constant, "Empty formula should return nil")
     
     diceSize, diceAmount, constant = Dice.getDicesFromFormula(nil)
-    test.assert_equal(nil, diceSize, "Nil formula should return nil")
-    test.assert_equal(nil, diceAmount, "Nil formula should return nil")
-    test.assert_equal(nil, constant, "Nil formula should return nil")
+    test.assert_equal(nil, diceSize, "Nil formula should return nil (1)")
+    test.assert_equal(nil, diceAmount, "Nil formula should return nil (2)")
+    test.assert_equal(nil, constant, "Nil formula should return nil (3)")
     
     -- Test roll function with controlled random values
     test.newSection("Dice Roll Tests - Controlled")
@@ -167,20 +167,16 @@ function run(test)
     test.newSection("Edge Case Tests")
     
     -- Test invalid formula returns default
-    result = Dice.roll("invalid", nil, 42)
-    test.assert_equal(42, result, "Invalid formula should return default value")
-    
-    -- Test invalid formula without default
-    result = Dice.roll("invalid")
-    test.assert_equal(1, result, "Invalid formula without default should return 1")
+    result = Dice.roll("invalid", nil)
+    test.assert_equal(nil, result, "Invalid formula should return nil")
     
     -- Test nil formula with fallback parameters
     result = Dice.roll(nil, 3, 6)
-    test.assert_equal(true, result >= 3 and result <= 18, "Nil formula with fallback should use fallback logic")
-    
+    test.assert_equal(nil, result, "Nil formula should return nil")
+
     -- Test nil formula without fallback
     result = Dice.roll(nil)
-    test.assert_equal(1, result, "Nil formula without fallback should return 1")
+    test.assert_equal(nil, result, "Nil formula should return nil")
     
     -- Test multiple dice with large numbers
     for i = 1, 10 do

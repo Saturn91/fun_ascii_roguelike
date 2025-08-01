@@ -50,23 +50,15 @@ function Dice.getDicesFromFormula(diceFormula)
 end
 
 -- dice formula can be "2d6" "d6" "2d6+3"
-function Dice.roll(diceFormula, diceCount, default)
+function Dice.roll(diceFormula, diceCount)
     -- If no formula provided, use diceCount and default as fallback
-    if not diceFormula then
-        if diceCount and default then
-            return love.math.random(diceCount, diceCount * default)
-        end
-        return 1
+    if not Dice.validateFormula(diceFormula) then
+        Log.log("[error]invalid dice markup " .. (diceFormula or "nil") .. "[/error]")
+        return
     end
     
     -- Parse the dice formula
     local diceSize, numDice, modifier = Dice.getDicesFromFormula(diceFormula)
-    
-    -- If parsing failed, return default or 1
-    if not diceSize or not numDice then
-        Log.log("Invalid dice formula: " .. (diceFormula or "nil"))
-        return default or 1
-    end
     
     -- Roll the dice
     local total = 0
