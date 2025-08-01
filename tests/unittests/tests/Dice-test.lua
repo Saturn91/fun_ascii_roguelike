@@ -187,6 +187,22 @@ function run(test)
         result = Dice.roll("10d10")
         test.assert_equal(true, result >= 10 and result <= 100, "10d10 roll " .. i .. " should be between 10-100, got " .. result)
     end
+
+    --Test Dice.validateFormula
+    local testCases = {
+        { formula ="d6", valid = true },
+        { formula = "2d6", valid = true},
+        { formula = "2d6+3", valid = true},
+        { formula = "d20-2", valid = true},
+        { formula = "3d8+5", valid = true},
+        { formula = "invalid", valid = false},
+        { formula = "", valid = false},
+        { formula = "nil", valid = false},
+    }
+
+    for _, case in ipairs(testCases) do
+        test.assert_equal(case.valid, Dice.validateFormula(case.formula), case.formula)
+    end
 end
 
 return run

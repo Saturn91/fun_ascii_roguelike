@@ -81,4 +81,9 @@ function Dice.roll(diceFormula, diceCount, default)
     return math.max(1, total)
 end
 
+function Dice.validateFormula(diceFormula)
+    val1, val2 = Dice.getDicesFromFormula(diceFormula)
+    return val1 ~= nil and val2 ~= nil
+end
+
 return Dice
