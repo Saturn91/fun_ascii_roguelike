@@ -1,6 +1,7 @@
 -- Weapon Configuration Array
 local weaponConfig = {
     sword = {
+        id = "sword",
         char = "/",
         color = "silver",
         damage = "2d2",
@@ -8,6 +9,7 @@ local weaponConfig = {
         name = "Sword"
     },
     bow = {
+        id = "bow",
         char = "}",
         color = "brown",
         damage = "1d6",
@@ -15,10 +17,11 @@ local weaponConfig = {
         name = "Bow"
     },
     staff = {
+        id = "staff",
         char = "|",
         color = "white",
-        damage = 4,
-        range = 3,
+        damage = "1d1",
+        range = 1,
         name = "Staff"
     }
 }
@@ -60,6 +63,11 @@ function weaponConfig.validateWeapon(weaponType, weapon)
         return string.format("Weapon '%s' must be a table", weaponType)
     end
 
+    -- Validate id
+    if not weapon.id or type(weapon.id) ~= "string" or weapon.id == "" then
+        return string.format("Weapon '%s' must have a valid id", weaponType)
+    end
+
     -- Validate char
     if not weapon.char or type(weapon.char) ~= "string" or weapon.char == "" then
         return string.format("Weapon '%s' must have a valid char", weaponType)
@@ -71,9 +79,21 @@ function weaponConfig.validateWeapon(weaponType, weapon)
     end
 
     -- Validate damage
-    if not weapon.damage or type(weapon.damage) ~= "number" or weapon.damage <= 0 then
-        return string.format("Weapon '%s' damage must be a positive number", weaponType)
+    if not weapon.damage or not Dice.validateFormula(weapon.damage) then
+        return string.format("Weapon '%s' damage invalid dice formula (e.g. 1d2)", weaponType)
     end
+
+    -- Validate range
+    if weapon.range and (type(weapon.range) ~= "number" or weapon.range < 1) then
+        return string.format("Weapon '%s' range must be a positive number", weaponType)
+    end
+
+    -- Validate name
+    if weapon.name and type(weapon.name) ~= "string" then
+        return string.format("Weapon '%s' name must be a string", weaponType)
+    end
+
+    return true
 end
 
 return weaponConfig

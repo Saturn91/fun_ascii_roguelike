@@ -14,6 +14,12 @@ local configs = {
         luaName = "game.config.enemy",
         isArray = true,
         idField = "id"  -- The field that serves as the key for array configs
+    },
+    WEAPONS = {
+        csvName = "weapons",
+        luaName = "game.config.weapons",
+        isArray = true,
+        idField = "id"  -- The field that serves as the key for array configs
     }
 }
 
