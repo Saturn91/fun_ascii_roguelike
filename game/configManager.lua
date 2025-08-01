@@ -13,13 +13,11 @@ local configs = {
         csvName = "enemy", 
         luaName = "game.config.enemy",
         isArray = true,
-        idField = "id"  -- The field that serves as the key for array configs
     },
     WEAPONS = {
         csvName = "weapons",
         luaName = "game.config.weapons",
         isArray = true,
-        idField = "id"  -- The field that serves as the key for array configs
     }
 }
 
@@ -45,7 +43,7 @@ local function getConfigFilePath(csvName)
 end
 
 -- Helper function to convert table to CSV format
-local function tableToCSV(data, isArray, idField)
+local function tableToCSV(data, isArray)
     local lines = {}
     
     if isArray then
@@ -57,9 +55,9 @@ local function tableToCSV(data, isArray, idField)
         
         -- Generate header from the first item's fields, with idField first
         local headers = {}
-        table.insert(headers, idField)
+        table.insert(headers, "id")
         for key, _ in pairs(firstItem) do
-            if key ~= idField then
+            if key ~= "id" then
                 table.insert(headers, key)
             end
         end
@@ -87,7 +85,7 @@ local function tableToCSV(data, isArray, idField)
 end
 
 -- Helper function to parse CSV format to table
-local function csvToTable(csvContent, isArray, idField)
+local function csvToTable(csvContent, isArray)
     local lines = {}
     for line in csvContent:gmatch("[^\r\n]+") do
         table.insert(lines, line)
@@ -179,7 +177,7 @@ local function loadConfig(configKey)
         -- File exists, load it
         local content = love.filesystem.read(configFile)
         if content then
-            local config = csvToTable(content, configDef.isArray, configDef.idField)
+            local config = csvToTable(content, configDef.isArray)
             if config then
                 -- Validate the loaded config
                 local validationResult = defaultConfig.validate(config)
@@ -226,7 +224,7 @@ local function loadConfig(configKey)
         LocalFileUtil.createPathDirectoryIfNotExists(configFile)
         
         -- Save default config
-        local csvContent = tableToCSV(ConfigManager[configKey], configDef.isArray, configDef.idField)
+        local csvContent = tableToCSV(ConfigManager[configKey], configDef.isArray)
         LocalFileUtil.writeFile(configFile, csvContent)
     end
     
@@ -263,7 +261,7 @@ end
 function ConfigManager.save()
     for configKey, configDef in pairs(configs) do
         local configFile = getConfigFilePath(configDef.csvName)
-        local csvContent = tableToCSV(ConfigManager[configKey], configDef.isArray, configDef.idField)
+        local csvContent = tableToCSV(ConfigManager[configKey], configDef.isArray)
         LocalFileUtil.writeFile(configFile, csvContent)
     end
     
