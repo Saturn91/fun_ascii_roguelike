@@ -1,9 +1,9 @@
 -- Player module for ASCII Roguelike
 local Player = {}
 
--- Import player configuration and colors
-local PlayerConfig = require("game.config.player")
+-- Import colors and config manager
 local Colors = require("Colors")
+local ConfigManager = require("game.configManager")
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
@@ -15,10 +15,10 @@ end
 
 -- Create a new player at the specified position
 function Player.new(x, y, health)
-    local playerHealth = health or PlayerConfig.health
+    local playerHealth = health or ConfigManager.PLAYER.health
     
     -- Resolve player color
-    local color = PlayerConfig.color
+    local color = ConfigManager.PLAYER.color
     if not color or color == "" then
         color = Colors.palette.player -- Use default player color from palette
     elseif type(color) == "string" then
@@ -28,12 +28,12 @@ function Player.new(x, y, health)
     return {
         x = x,
         y = y,
-        char = PlayerConfig.char or "@",
+        char = ConfigManager.PLAYER.char or "@",
         color = color,
         health = playerHealth,
         maxHealth = playerHealth,
         walkable = true,
-        baseAttackDamage = PlayerConfig.baseAttackDamage
+        baseAttackDamage = ConfigManager.PLAYER.baseAttackDamage
     }
 end
 
@@ -120,7 +120,7 @@ end
 
 -- Player attacks an enemy
 function Player.attackEnemy(player, enemy, gameGrid)
-    local damage = player.baseAttackDamage or PlayerConfig.baseAttackDamage -- Use player's attack damage
+    local damage = player.baseAttackDamage or ConfigManager.PLAYER.baseAttackDamage -- Use player's attack damage
     
     -- Import Enemy module locally to avoid circular dependency
     local Enemy = require("game.enemy")

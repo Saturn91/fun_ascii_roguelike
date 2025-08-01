@@ -1,10 +1,10 @@
 -- Enemy module for ASCII Roguelike
 local Enemy = {}
 
--- Import AI module, enemy configuration, and colors
+-- Import AI module, colors, and config manager
 local EnemyAI = require("game.enemy.ai")
-local EnemyTypes = require("game.config.enemy")
 local Colors = require("Colors")
+local ConfigManager = require("game.configManager")
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
@@ -23,7 +23,7 @@ local enemies = {}
 
 -- Create a new enemy of specified type at position
 function Enemy.new(x, y, enemyType)
-    local template = EnemyTypes[enemyType]
+    local template = ConfigManager.ENEMY[enemyType]
     if not template then
         error("Unknown enemy type: " .. tostring(enemyType))
     end

@@ -17,11 +17,15 @@ local Menu = require("menu.menu")
 local GameState = require("game.gameState")
 local PauseMenu = require("menu.pauseMenu")
 local GameOverScreen = require("menu.gameOverScreen")
+local ConfigManager = require("game.configManager")
 require("util._index")
 require("sandbox/Sandbox")
 Sandbox.init()
 
 function love.load()
+    -- Initialize configuration manager first
+    ConfigManager.load()
+    
     -- Set up the game window
     love.window.setTitle("ASCII Roguelike")
     
