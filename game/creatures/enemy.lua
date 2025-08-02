@@ -16,6 +16,13 @@ function Enemy.setUI(uiModule)
     UI = uiModule
 end
 
+-- Increment kill count and log it
+function Enemy.incrementKillCount()
+    killCount = killCount + 1
+    local Log = require("game.ui.Logger")
+    Log.log(string.format("[info]Enemies defeated: %d[/info]", killCount))
+end
+
 -- List to store all active enemies
 local enemies = {}
 
@@ -101,36 +108,10 @@ function Enemy.updateAI(enemy, player, gameGrid, gridWidth, gridHeight)
     
     -- Handle attack action
     if action == "attack" then
-        Enemy.attackPlayer(enemy, player)
+        AttackHandler.attack(enemy, player, gameGrid)
     end
     
     return action
-end
-
--- Enemy attacks the player
-function Enemy.attackPlayer(enemy, player)
-    Player.takeDamage(player, enemy.damage)
-    Log.log(string.format("[red]%s[/red] attacks [gold]@[/gold] for [damage]%d damage[/damage]!", 
-        enemy.name, enemy.damage))
-end
-
--- Player attacks an enemy
-function Enemy.takeDamage(enemy, damage, gameGrid)
-    local actualDamage = enemy.healthManager:damage(damage)
-    
-    Log.log(string.format("[gold]@[/gold] attacks [red]%s[/red] for [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
-        enemy.name, actualDamage, enemy.healthManager.health, enemy.healthManager.maxHealth))
-    
-    if enemy.healthManager.health <= 0 then
-        Log.log(string.format("[success]%s defeated![/success]", enemy.name))
-        -- Increment kill count
-        killCount = killCount + 1
-        Log.log(string.format("[info]Enemies defeated: %d[/info]", killCount))
-        -- Remove enemy from grid
-        gameGrid[enemy.y][enemy.x] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
-        -- Remove from enemies list
-        Enemy.remove(enemy)
-    end
 end
 
 -- Update all enemies (called each turn)

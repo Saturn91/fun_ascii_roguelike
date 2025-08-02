@@ -43,13 +43,6 @@ function Player.new(x, y, health)
     return player
 end
 
--- Damage the player (reduce health)
-function Player.takeDamage(player, damage)
-    local actualDamage = player.healthManager:damage(damage)
-    Log.log(string.format("["..player.color.."]"..player.char.."[/"..player.color.."] takes [damage]%d actualDamage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
-        actualDamage, player.healthManager.health, player.healthManager.maxHealth))
-end
-
 -- Heal the player (restore health)
 function Player.heal(player, amount)
     local actualHealed = player.healthManager:heal(amount)
@@ -92,8 +85,8 @@ function Player.moveTo(player, newX, newY, gameGrid, gridWidth, gridHeight)
         
         -- Check if there's an enemy at the target position
         if targetTile and targetTile.isEnemy and targetTile.enemy then
-            -- Attack the enemy instead of moving
-            Player.attackEnemy(player, targetTile.enemy, gameGrid)
+            -- Attack the enemy using AttackHandler
+            AttackHandler.attack(player, targetTile.enemy, gameGrid)
             return true -- Action taken (attack)
         elseif targetTile and targetTile.walkable then
             -- Use inherited moveTo method from Creature
@@ -106,16 +99,6 @@ function Player.moveTo(player, newX, newY, gameGrid, gridWidth, gridHeight)
     end
     
     return false -- Out of bounds
-end
-
-
--- Player attacks an enemy
-function Player.attackEnemy(player, enemy, gameGrid)
-    local damage = player.baseAttackDamage or ConfigManager.PLAYER.baseAttackDamage -- Use player's attack damage
-    
-    -- Import Enemy module locally to avoid circular dependency
-    local Enemy = require("game.creatures.enemy")
-    Enemy.takeDamage(enemy, damage, gameGrid)
 end
 
 return Player

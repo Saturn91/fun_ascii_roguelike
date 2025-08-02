@@ -1,3 +1,4 @@
+AttackHandler = require("game.combat.AttackHandler")
 InventoryController = require("game.inventoryController")
 Creature = require("game.creatures.creature")
 Player = require("game.creatures.player")
