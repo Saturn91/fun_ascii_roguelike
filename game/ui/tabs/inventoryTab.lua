@@ -10,7 +10,6 @@ local selectedType = nil  -- "equipment" or "backpack"
 function InventoryTab.draw(gameGrid, area, player)
     -- Build inventory display with item characters
     local lines = {
-        "INVENTORY",
         "",
         "Equipment:",
         string.format("[r] right hand: %s", InventoryTab.getItemDisplay("equipment", "r", player)),

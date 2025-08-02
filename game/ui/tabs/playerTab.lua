@@ -5,6 +5,7 @@ local PlayerTab = {}
 -- Draw Player tab content
 function PlayerTab.draw(gameGrid, area, player)
     local lines = {
+        "",
         string.format("Player: %s", player.char or "@"),
         string.format("Pos: (%d,%d)", player.x or 0, player.y or 0),
         string.format("HP: %d/%d", player.health or 0, player.maxHealth or 0),

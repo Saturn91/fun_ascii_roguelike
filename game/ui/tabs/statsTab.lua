@@ -5,7 +5,6 @@ local StatsTab = {}
 -- Draw Stats tab content
 function StatsTab.draw(gameGrid, area, player)
     local lines = {
-        "STATISTICS",
         "",
         string.format("Enemies: %d", player.enemiesKilled or 0),
         string.format("Rooms: %d", player.roomsVisited or 1),
