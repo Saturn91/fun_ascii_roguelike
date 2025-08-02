@@ -16,6 +16,17 @@ A classic ASCII-based roguelike game built with the Love2D game engine. Features
 - ✅ **Room Generation** - Procedural rooms with corridors
 - ✅ **Player Movement** - Arrow key movement with collision detection (WASD removed for UI compatibility)
 
+### Advanced Combat & Creature System
+- ✅ **Object-Oriented Creature Inheritance** - Modular Creature base class with Player/Enemy inheritance
+- ✅ **Centralized Health Management** - HealthManager component with damage/heal/set methods
+- ✅ **Unified Movement System** - Shared moveTo() functionality with class-specific behaviors
+- ✅ **AttackHandler Combat System** - Centralized combat logic eliminating circular dependencies
+- ✅ **Weapon-Based Combat** - Equipped weapons override base damage using dice formulas
+- ✅ **Dice-Based Damage** - Realistic damage calculation using configurable dice (1d6, 2d4+1, etc.)
+- ✅ **Visual Combat Logging** - ASCII-themed attack messages showing attacker/victim/weapon characters
+- ✅ **Equipment Integration** - Right-hand weapon slot automatically used in combat
+- ✅ **Consistent Death Handling** - Unified creature death with grid cleanup and kill counting
+
 ### Inventory & Equipment System
 - ✅ **Full Inventory Management** - 10-slot backpack with equipment slots
 - ✅ **Equipment System** - Right hand, left hand, head, body, and feet slots
@@ -505,16 +516,29 @@ fun_ascii_roguelike/
 │   └── backgroundMap.lua # Animated background world for menus
 ├── tests/                # Unit testing framework and test files
 ├── game/
+│   ├── __index.lua       # Global module loader and dependencies
 │   ├── configManager.lua # Dynamic configuration management system
 │   ├── config/           # Default configuration modules
 │   │   ├── player.lua    # Default player configuration with validation
-│   │   └── enemy.lua     # Default enemy configurations with validation
+│   │   ├── enemy.lua     # Default enemy configurations with validation
+│   │   └── weapons.lua   # Default weapon configurations with dice damage
 │   ├── dice.lua          # Dice rolling system with formula parsing
 │   ├── room.lua          # Room system and player placement
 │   ├── mapGenerator.lua  # Procedural dungeon generation
-│   ├── item.lua          # Base Item class for weapons, armor, consumables
-│   ├── player.lua        # Player creation, movement, and combat
-│   ├── enemy.lua         # Enemy creation, management, and combat
+│   ├── inventoryController.lua # Equipment and backpack management system
+│   ├── creatures/        # Creature system with OOP inheritance
+│   │   ├── creature.lua  # Base Creature class with shared functionality
+│   │   ├── HealthManager.lua # Centralized health management component
+│   │   ├── player.lua    # Player creation, movement, and combat
+│   │   └── enemy.lua     # Enemy creation, management, and AI integration
+│   ├── combat/           # Combat system components
+│   │   └── AttackHandler.lua # Centralized attack logic with weapon integration
+│   ├── items/            # Item system with inheritance
+│   │   ├── item.lua      # Base Item class for all game items
+│   │   ├── weapon.lua    # Weapon class extending Item with combat stats
+│   │   ├── armor.lua     # Armor class extending Item (future expansion)
+│   │   ├── consumable.lua # Consumable class extending Item (future expansion)
+│   │   └── itemManager.lua # Item creation and configuration integration
 │   ├── controls.lua      # Keyboard input and game controls
 │   ├── gameState.lua     # Game state management (menu/playing/paused/game_over)
 │   ├── enemy/
@@ -522,9 +546,14 @@ fun_ascii_roguelike/
 │   ├── ui.lua            # Main UI controller
 │   └── ui/
 │       ├── titleSection.lua   # Game title and info
-│       ├── Log.lua         # Colored message logging
+│       ├── Logger.lua         # Colored message logging system
 │       ├── controls.lua       # Control instructions
-│       └── healthBar.lua      # ASCII health visualization
+│       ├── healthBar.lua      # ASCII health visualization
+│       ├── tabSystem.lua      # Central tab navigation controller
+│       └── tabs/              # Individual tab implementations
+│           ├── playerTab.lua  # Player stats and information
+│           ├── inventoryTab.lua # Interactive inventory management
+│           └── statsTab.lua   # Game statistics and progress
 └── assets/
     └── fonts/
         └── DejaVuSansMono.ttf # Integrated monospace font
@@ -697,24 +726,102 @@ The test suite includes comprehensive testing for:
 
 The repository includes Git pre-commit hooks that automatically run the test suite before allowing commits, ensuring code quality and preventing regressions.
 
+## Technical Architecture
+
+### Creature System Hierarchy
+
+The game uses a modern object-oriented inheritance system built on Lua metatables:
+
+```
+Creature (Base Class)
+├── HealthManager integration
+├── Shared movement logic (moveTo)
+├── Grid placement (placeOnGrid)
+├── Inventory system integration
+│
+├── Player (Inherits from Creature)
+│   ├── Player-specific combat logic
+│   ├── Input handling
+│   └── Enemy attack detection
+│
+└── Enemy (Inherits from Creature)
+    ├── AI behavior integration
+    ├── Kill counting
+    └── Enemy-specific movement restrictions
+```
+
+### Combat System Architecture
+
+**AttackHandler (Centralized Combat)**
+- Eliminates circular dependencies between Player/Enemy
+- Weapon-aware damage calculation
+- Dice-based damage rolling (1d6, 2d4+1, etc.)
+- Unified death handling with grid cleanup
+- Visual ASCII-themed combat logging
+
+**Weapon Integration**
+- Right-hand equipment slot (`inventory.equipment.r`) automatically used
+- Weapon damage formulas override base creature damage
+- Fallback to `baseAttackDamage` for unarmed combat
+- Real-time dice roll logging for transparency
+
+### Component Systems
+
+**HealthManager**: OOP health management with bounds checking
+- `damage(amount)` - Apply damage with clamping
+- `heal(amount)` - Restore health with max limit  
+- `set(amount)` - Direct health setting
+
+**Dice System**: Flexible damage calculation
+- Supports formats: `d6`, `2d6`, `1d8+2`, `3d4-1`
+- Validation and error handling
+- Deterministic testing support
+
+**InventoryController**: Reusable inventory logic
+- Equipment slots (r, l, h, b, f)
+- 10-slot backpack system
+- Context-sensitive item actions
+
+### Modular Design Benefits
+
+1. **No Circular Dependencies**: AttackHandler eliminates Player ↔ Enemy references
+2. **Code Reusability**: Shared Creature functionality reduces duplication
+3. **Extensibility**: Easy to add new creature types or combat features
+4. **Maintainability**: Centralized systems make debugging and updates simpler
+5. **Consistency**: All creatures use the same health, movement, and combat systems
+
 ## Contributing
 
 This is a learning project demonstrating:
 - Love2D game development patterns
-- Modular Lua architecture
+- Modular Lua architecture with OOP inheritance
 - ASCII art and text-based game design
 - Color markup system implementation
 - Integrated asset management
 - Game state management systems
 - Semi-transparent overlay techniques
 - Professional pause menu implementation
+- Object-oriented creature and combat systems
+- Centralized component architecture
 
 ### Project Highlights
 - **Complete roguelike experience** with procedural generation
 - **Professional UI systems** with colored text and visual feedback
 - **Advanced enemy AI** with multiple behavior patterns
+- **Modern combat system** with weapon-based dice damage
+- **Object-oriented creature hierarchy** with shared functionality
+- **Centralized attack handling** eliminating circular dependencies
+- **Equipment integration** with automatic weapon usage
 - **Clean modular architecture** enabling easy feature additions
 - **Modern pause menu** with transparency effects
 - **Comprehensive documentation** for learning and reference
+
+### Recent Major Updates (Latest Session)
+- **Creature Inheritance System**: Refactored to use proper OOP inheritance
+- **HealthManager Component**: Centralized health management with bounds checking
+- **AttackHandler System**: Unified combat logic with weapon integration
+- **Dice-Based Combat**: Realistic damage using configurable dice formulas
+- **Equipment Integration**: Weapons automatically used in combat calculations
+- **Visual Combat Logging**: ASCII-themed attack messages with character display
 
 Feel free to explore the code and adapt it for your own ASCII roguelike projects!
