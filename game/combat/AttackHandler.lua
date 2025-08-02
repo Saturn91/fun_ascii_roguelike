@@ -2,6 +2,30 @@
 -- Handles all attack behavior between creatures
 local AttackHandler = {}
 
+-- Calculate damage for an attacker, considering equipped weapons
+-- @param attacker - The creature performing the attack
+-- @return number - The calculated damage value
+function AttackHandler.calculateDamage(attacker)
+    if not attacker then
+        return 1
+    end
+    
+    -- Check if attacker has inventory and a weapon equipped in right hand
+    if attacker.inventory and attacker.inventory.equipment and attacker.inventory.equipment.r then
+        local weapon = attacker.inventory.equipment.r
+        
+        -- If weapon has a damage dice formula, roll it
+        if weapon.damage and Dice.validateFormula(weapon.damage) then
+            local rollResult = Dice.roll(weapon.damage)
+            Log.log(string.format("[info]%s:%s damage roll: %s = %d[/info]", attacker.char, weapon.char, weapon.damage, rollResult))
+            return rollResult
+        end
+    end
+    
+    -- Fall back to base attack damage
+    return attacker.baseAttackDamage or 1
+end
+
 -- Handle attack between two creatures
 -- @param attacker - The creature performing the attack
 -- @param victim - The creature being attacked
@@ -12,8 +36,8 @@ function AttackHandler.attack(attacker, victim, gameGrid)
         return false
     end
     
-    -- Get attack damage from attacker
-    local damage = attacker.baseAttackDamage or 1
+    -- Calculate attack damage
+    local damage = AttackHandler.calculateDamage(attacker)
     
     -- Apply damage to victim using their health manager
     local actualDamage = victim.healthManager:damage(damage)
@@ -22,8 +46,17 @@ function AttackHandler.attack(attacker, victim, gameGrid)
     local attackerName = attacker.name or (attacker.char and string.format("[%s]%s[/%s]", attacker.color, attacker.char, attacker.color)) or "Unknown"
     local victimName = victim.name or (victim.char and string.format("[%s]%s[/%s]", victim.color, victim.char, victim.color)) or "Unknown"
     
-    Log.log(string.format("%s attacks %s for [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
-        attackerName, victimName, actualDamage, victim.healthManager.health, victim.healthManager.maxHealth))
+    -- Check if attacker used a weapon
+    local weaponInfo = ""
+    if attacker.inventory and attacker.inventory.equipment and attacker.inventory.equipment.r then
+        local weapon = attacker.inventory.equipment.r
+        local weaponChar = weapon.char or "?"
+        local weaponColor = weapon.color or "silver"
+        weaponInfo = string.format(" with [%s]%s[/%s]", weaponColor, weaponChar, weaponColor)
+    end
+    
+    Log.log(string.format("%s attacks %s%s for [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
+        attackerName, victimName, weaponInfo, actualDamage, victim.healthManager.health, victim.healthManager.maxHealth))
     
     -- Check if victim died
     if victim.healthManager.health <= 0 then
