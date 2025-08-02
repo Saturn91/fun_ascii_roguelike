@@ -8,7 +8,7 @@ local ConfigManager = require("game.configManager")
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
-local Player = require("game.player")
+local Player = require("game.creatures.player")
 
 -- Kill counter
 local killCount = 0

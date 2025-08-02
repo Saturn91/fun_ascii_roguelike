@@ -73,7 +73,7 @@ function EnemyAI.moveToPosition(enemy, newX, newY, gameGrid, gridWidth, gridHeig
         enemy.y = newY
         
         -- Place enemy at new position (we'll need to import Enemy module for this)
-        local Enemy = require("game.enemy")
+        local Enemy = require("game.creatures.enemy")
         Enemy.placeOnGrid(enemy, gameGrid)
         
         return true

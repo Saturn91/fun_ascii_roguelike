@@ -4,7 +4,7 @@ local BackgroundMap = {}
 
 -- Import required modules
 local MapGenerator = require("game.mapGenerator")
-local Enemy = require("game.enemy")
+local Enemy = require("game.creatures.enemy")
 
 -- Background world state
 local backgroundGrid = nil

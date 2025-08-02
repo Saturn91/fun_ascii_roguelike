@@ -3,9 +3,9 @@
 local Controls = {}
 
 -- Import required modules
-local Player = require("game.player")
+local Player = require("game.creatures.player")
 local ConfigManager = require("game.configManager")
-local Enemy = require("game.enemy")
+local Enemy = require("game.creatures.enemy")
 local UI = require("game.ui")
 local GameState = require("game.gameState")
 local PauseMenu = require("menu.pauseMenu")

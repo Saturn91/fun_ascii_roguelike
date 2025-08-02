@@ -1,10 +1,6 @@
 -- Player module for ASCII Roguelike
 local Player = {}
-
--- Import colors and config manager
-local Colors = require("Colors")
-local ConfigManager = require("game.configManager")
-local InventoryController = require("game.inventoryController")
+Player.__index = Player
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
@@ -26,24 +22,26 @@ function Player.new(x, y, health)
         color = Colors.palette[color] or Colors.palette.player -- Resolve string to color value
     end
     
-    local instance = {
+    -- Create base creature with player-specific config
+    local creatureConfig = {
         x = x,
         y = y,
         char = ConfigManager.PLAYER.char or "@",
         color = color,
         health = playerHealth,
-        maxHealth = playerHealth,
         walkable = true,
-        baseAttackDamage = ConfigManager.PLAYER.baseAttackDamage,
-        inventory = InventoryController.new()
+        baseAttackDamage = ConfigManager.PLAYER.baseAttackDamage
     }
+    
+    local player = Creature.new(creatureConfig)
+    setmetatable(player, Player)
 
     if ConfigManager.PLAYER.weapon then
-        local slot = instance.inventory:addItem(ConfigManager.PLAYER.weapon)
-        instance.inventory:equip(slot)
+        local slot = player.inventory:addItem(ConfigManager.PLAYER.weapon)
+        player.inventory:equip(slot)
     end
 
-    return instance
+    return player
 end
 
 -- Damage the player (reduce health)
@@ -132,7 +130,7 @@ function Player.attackEnemy(player, enemy, gameGrid)
     local damage = player.baseAttackDamage or ConfigManager.PLAYER.baseAttackDamage -- Use player's attack damage
     
     -- Import Enemy module locally to avoid circular dependency
-    local Enemy = require("game.enemy")
+    local Enemy = require("game.creatures.enemy")
     Enemy.takeDamage(enemy, damage, gameGrid)
 end
 

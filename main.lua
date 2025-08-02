@@ -8,6 +8,7 @@ VERSION = "1.0.0"
 Log = require("game.ui.Logger")
 
 -- Import game modules
+Colors = require("Colors")
 local Fonts = require("fonts")
 local AsciiGrid = require("asciiGrid")
 local Game = require("game.__index")
