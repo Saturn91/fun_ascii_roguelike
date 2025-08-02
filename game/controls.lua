@@ -48,10 +48,10 @@ function Controls.handlePlayingInput(key, player, gameGrid)
     
     -- Test keys for health bar (temporary)
     if key == "h" then
-        Player.heal(player, 1)
+        player.healthManager:heal(1)
         return
     elseif key == "j" then
-        Player.takeDamage(player, 1)
+        player.healthManager:damage(1)
         return
     end
     

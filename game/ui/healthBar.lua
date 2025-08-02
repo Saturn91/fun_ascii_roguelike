@@ -21,7 +21,7 @@ function HealthBar.draw(gameGrid, player, gameAreaWidth)
     local barY = 1  -- Top row
     
     -- Calculate how many blocks should be filled based on health percentage
-    local healthPercent = player.health / player.maxHealth
+    local healthPercent = player.healthManager:getPercentage()
     local filledBlocks = math.floor(barWidth * healthPercent)
     
     -- Draw the health bar
@@ -49,7 +49,7 @@ function HealthBar.draw(gameGrid, player, gameAreaWidth)
     end
     
     -- Draw health text (HP: X/Y) to the right of the bar with 3-digit zero padding
-    local healthText = string.format("HP: %03d/%03d", player.health, player.maxHealth)
+    local healthText = string.format("HP: %03d/%03d", player.healthManager.health, player.healthManager.maxHealth)
     local textStartX = barStartX + barWidth + 2
     
     for i = 1, #healthText do

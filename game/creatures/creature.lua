@@ -1,4 +1,5 @@
 local Creature = {}
+local HealthManager = require("game.creatures.HealthManager")
 
 Creature.__index = Creature
 
@@ -8,12 +9,13 @@ function Creature.new(config)
         y = config.y or 0,
         char = config.char,
         color = config.color,
-        health = config.health,
-        maxHealth = config.health,
         walkable = config.walkable or false,
         baseAttackDamage = config.baseAttackDamage,
-        inventory = InventoryController.new()
+        inventory = InventoryController.new(),
     }, Creature)
+
+    instance.healthManager = HealthManager.new(config.health, self)
+
     return instance
 end
 

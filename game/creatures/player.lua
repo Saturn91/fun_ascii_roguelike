@@ -17,9 +17,7 @@ function Player.new(x, y, health)
     -- Resolve player color
     local color = ConfigManager.PLAYER.color
     if not color or color == "" then
-        color = Colors.palette.player -- Use default player color from palette
-    elseif type(color) == "string" then
-        color = Colors.palette[color] or Colors.palette.player -- Resolve string to color value
+        color = "player"
     end
     
     -- Create base creature with player-specific config
@@ -46,21 +44,21 @@ end
 
 -- Damage the player (reduce health)
 function Player.takeDamage(player, damage)
-    player.health = math.max(0, player.health - damage)
-    Log.log(string.format("[gold]"..player.char.."[/gold] takes [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
-        damage, player.health, player.maxHealth))
+    local actualDamage = player.healthManager:damage(damage)
+    Log.log(string.format("["..player.color.."]"..player.char.."[/"..player.color.."] takes [damage]%d actualDamage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
+        actualDamage, player.healthManager.health, player.healthManager.maxHealth))
 end
 
 -- Heal the player (restore health)
 function Player.heal(player, amount)
-    player.health = math.min(player.maxHealth, player.health + amount)
-    Log.log(string.format("[gold]"..player.char.."[/gold] heals [heal]%d health[/heal]! ([health]%d[/health]/[health]%d[/health])", 
-        amount, player.health, player.maxHealth))
+    local actualHealed = player.healthManager:heal(amount)
+    Log.log(string.format("["..player.color.."]"..player.char.."[/"..player.color.."] heals [heal]%d health[/heal]! ([health]%d[/health]/[health]%d[/health])", 
+        actualHealed, player.healthManager.health, player.healthManager.maxHealth))
 end
 
 -- Check if player is alive
 function Player.isAlive(player)
-    return player.health > 0
+    return player.healthManager.health > 0
 end
 
 -- Handle player movement input and update position
@@ -120,7 +118,7 @@ end
 function Player.placeOnGrid(player, gameGrid)
     gameGrid[player.y][player.x] = {
         char = player.char, 
-        color = player.color, 
+        color = Colors.get(player.color), 
         walkable = true
     }
 end
@@ -132,16 +130,6 @@ function Player.attackEnemy(player, enemy, gameGrid)
     -- Import Enemy module locally to avoid circular dependency
     local Enemy = require("game.creatures.enemy")
     Enemy.takeDamage(enemy, damage, gameGrid)
-end
-
--- Get player's current position
-function Player.getPosition(player)
-    return player.x, player.y
-end
-
--- Check if player is at a specific position
-function Player.isAt(player, x, y)
-    return player.x == x and player.y == y
 end
 
 return Player

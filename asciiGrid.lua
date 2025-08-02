@@ -111,7 +111,12 @@ function AsciiGrid.draw(grid)
         for x = 1, gridWidth do
             local cell = grid[y][x]
             if cell and cell.char and cell.char ~= " " then  -- Don't render space characters
-                love.graphics.setColor(cell.color)
+                if type(cell.color) == "string" then
+                    love.graphics.setColor(Colors.get(cell.color))
+                else
+                    love.graphics.setColor(cell.color)
+                end
+                
                 love.graphics.print(cell.char, (x-1) * charWidth, (y-1) * charHeight)
             end
         end

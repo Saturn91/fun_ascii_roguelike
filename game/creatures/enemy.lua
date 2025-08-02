@@ -30,8 +30,8 @@ function Enemy.new(x, y, enemyType)
     
     -- Resolve color string to actual color values
     local color = template.color
-    if type(color) == "string" then
-        color = Colors.palette[color] or Colors.palette.white -- Fallback to white if color not found
+    if color == nil or color == "" then
+        color = "white"
     end
     
     local enemy = {
@@ -160,7 +160,7 @@ end
 function Enemy.placeOnGrid(enemy, gameGrid)
     gameGrid[enemy.y][enemy.x] = {
         char = enemy.char,
-        color = enemy.color,
+        color = Colors.get(enemy.color),
         walkable = false,
         isEnemy = true,
         enemy = enemy -- Reference to the enemy object

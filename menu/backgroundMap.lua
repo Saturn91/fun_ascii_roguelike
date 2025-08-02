@@ -78,7 +78,7 @@ function BackgroundMap.update(dt)
                     -- Place enemy at new position
                     if backgroundGrid[newY] and backgroundGrid[newY][newX] then
                         backgroundGrid[newY][newX].char = enemy.char
-                        backgroundGrid[newY][newX].color = enemy.color
+                        backgroundGrid[newY][newX].color = Colors.get(enemy.color)
                     end
                 end
             end
