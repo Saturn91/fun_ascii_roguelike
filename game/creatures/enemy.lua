@@ -1,7 +1,7 @@
 -- Enemy module for ASCII Roguelike
 local Enemy = {}
+Enemy.__index = Enemy
 
--- Import AI module, colors, and config manager
 local EnemyAI = require("game.enemy.ai")
 local Colors = require("Colors")
 local ConfigManager = require("game.configManager")
@@ -34,21 +34,28 @@ function Enemy.new(x, y, enemyType)
         color = "white"
     end
     
-    local enemy = {
+    -- Create base creature with enemy-specific config
+    local creatureConfig = {
         x = x,
         y = y,
         char = template.char,
         color = color,
+        damageLogColor = "red",
         health = template.health,
-        maxHealth = template.health,
-        damage = template.damage,
-        name = template.name,
-        moveChance = template.moveChance,
-        aggroRange = template.aggroRange,
-        type = enemyType,
         walkable = false, -- Enemies block movement
-        isEnemy = true
+        baseAttackDamage = template.damage
     }
+    
+    local enemy = Creature.new(creatureConfig)
+    setmetatable(enemy, Enemy)
+    
+    -- Add enemy-specific properties
+    enemy.damage = template.damage
+    enemy.name = template.name
+    enemy.moveChance = template.moveChance
+    enemy.aggroRange = template.aggroRange
+    enemy.type = enemyType
+    enemy.isEnemy = true
     
     -- Add to enemies list
     table.insert(enemies, enemy)
@@ -124,12 +131,12 @@ end
 
 -- Player attacks an enemy
 function Enemy.takeDamage(enemy, damage, gameGrid)
-    enemy.health = math.max(0, enemy.health - damage)
+    local actualDamage = enemy.healthManager:damage(damage)
     
     Log.log(string.format("[gold]@[/gold] attacks [red]%s[/red] for [damage]%d damage[/damage]! ([health]%d[/health]/[health]%d[/health])", 
-        enemy.name, damage, enemy.health, enemy.maxHealth))
+        enemy.name, actualDamage, enemy.healthManager.health, enemy.healthManager.maxHealth))
     
-    if enemy.health <= 0 then
+    if enemy.healthManager.health <= 0 then
         Log.log(string.format("[success]%s defeated![/success]", enemy.name))
         -- Increment kill count
         killCount = killCount + 1
@@ -150,7 +157,7 @@ function Enemy.updateAll(player, gameGrid, gridWidth, gridHeight)
     end
     
     for _, enemy in ipairs(enemiesCopy) do
-        if enemy.health > 0 then
+        if enemy.healthManager.health > 0 then
             Enemy.updateAI(enemy, player, gameGrid, gridWidth, gridHeight)
         end
     end
@@ -196,7 +203,7 @@ end
 -- Check if there's an enemy at the given position
 function Enemy.getEnemyAt(x, y)
     for _, enemy in ipairs(enemies) do
-        if enemy.x == x and enemy.y == y and enemy.health > 0 then
+        if enemy.x == x and enemy.y == y and enemy.healthManager.health > 0 then
             return enemy
         end
     end
@@ -207,7 +214,7 @@ end
 function Enemy.getCount(enemyType)
     local count = 0
     for _, enemy in ipairs(enemies) do
-        if enemy.type == enemyType and enemy.health > 0 then
+        if enemy.type == enemyType and enemy.healthManager.health > 0 then
             count = count + 1
         end
     end
@@ -218,7 +225,7 @@ end
 function Enemy.getTotalCount()
     local count = 0
     for _, enemy in ipairs(enemies) do
-        if enemy.health > 0 then
+        if enemy.healthManager.health > 0 then
             count = count + 1
         end
     end

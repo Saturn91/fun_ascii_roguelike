@@ -53,7 +53,7 @@ function BackgroundMap.update(dt)
         
         -- Update each enemy in the background
         for _, enemy in ipairs(backgroundEnemies) do
-            if enemy.health > 0 then
+            if enemy.healthManager:isAlive() then
                 -- Simple random movement for background enemies
                 local directions = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}, {0, 0}} -- up, down, left, right, stay
                 local direction = directions[love.math.random(1, #directions)]

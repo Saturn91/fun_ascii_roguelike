@@ -164,7 +164,7 @@ end
 -- Main AI decision function - chooses behavior based on enemy type
 function EnemyAI.updateBehavior(enemy, player, gameGrid, gridWidth, gridHeight)
     -- Don't act if enemy is dead
-    if enemy.health <= 0 then
+    if not enemy.healthManager:isAlive() then
         return "dead"
     end
     
