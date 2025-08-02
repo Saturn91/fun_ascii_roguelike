@@ -1,6 +1,7 @@
 -- Player module for ASCII Roguelike
 local Player = {}
 Player.__index = Player
+setmetatable(Player, Creature)
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
@@ -32,7 +33,7 @@ function Player.new(x, y, health)
     }
     
     local player = Creature.new(creatureConfig)
-    setmetatable(player, Player)
+    setmetatable(player, Creature)
 
     if ConfigManager.PLAYER.weapon then
         local slot = player.inventory:addItem(ConfigManager.PLAYER.weapon)
@@ -95,15 +96,8 @@ function Player.moveTo(player, newX, newY, gameGrid, gridWidth, gridHeight)
             Player.attackEnemy(player, targetTile.enemy, gameGrid)
             return true -- Action taken (attack)
         elseif targetTile and targetTile.walkable then
-            -- Clear old position (restore the floor)
-            gameGrid[player.y][player.x] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
-            
-            -- Update player position
-            player.x = newX
-            player.y = newY
-            gameGrid[player.y][player.x] = {char = player.char, color = player.color, walkable = true}
-            
-            return true -- Movement successful
+            -- Use inherited moveTo method from Creature
+            return player:moveTo(newX, newY, gameGrid, gridWidth, gridHeight)
         else
             -- Player tried to walk into a wall
             Log.log("[warning]Bonk![/warning] That's a wall!")
@@ -114,14 +108,6 @@ function Player.moveTo(player, newX, newY, gameGrid, gridWidth, gridHeight)
     return false -- Out of bounds
 end
 
--- Place the player on the game grid at their current position
-function Player.placeOnGrid(player, gameGrid)
-    gameGrid[player.y][player.x] = {
-        char = player.char, 
-        color = Colors.get(player.color), 
-        walkable = true
-    }
-end
 
 -- Player attacks an enemy
 function Player.attackEnemy(player, enemy, gameGrid)

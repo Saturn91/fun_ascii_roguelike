@@ -132,7 +132,7 @@ function startNewGame()
     -- Create and position the player using the Player module
     local startX, startY = Room.findPlayerStartPosition(gameGrid, gameAreaWidth, gameAreaHeight)
     player = Player.new(startX, startY) -- Use default health from config
-    Player.placeOnGrid(player, gameGrid)
+    player:placeOnGrid(gameGrid)
     
     -- Spawn some enemies
     Enemy.spawnRandom(gameGrid, gameAreaWidth, gameAreaHeight, 3, "goblin")

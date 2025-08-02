@@ -3,8 +3,6 @@ local Enemy = {}
 Enemy.__index = Enemy
 
 local EnemyAI = require("game.enemy.ai")
-local Colors = require("Colors")
-local ConfigManager = require("game.configManager")
 
 -- We'll get UI reference when needed to avoid circular dependency
 local UI = nil
@@ -86,27 +84,14 @@ end
 
 -- Move enemy to new position if valid
 function Enemy.moveTo(enemy, newX, newY, gameGrid, gridWidth, gridHeight)
-    -- Check bounds
-    if newX < 1 or newX > gridWidth or newY < 1 or newY > gridHeight then
+    -- Check if target position has an enemy (enemies can't move to occupied positions)
+    local targetCell = gameGrid[newY] and gameGrid[newY][newX]
+    if targetCell and targetCell.isEnemy then
         return false
     end
     
-    local targetCell = gameGrid[newY][newX]
-    if targetCell and targetCell.walkable and not targetCell.isEnemy then
-        -- Clear old position (restore the floor)
-        gameGrid[enemy.y][enemy.x] = {char = ".", color = {0.5, 0.5, 0.5}, walkable = true}
-        
-        -- Update enemy position
-        enemy.x = newX
-        enemy.y = newY
-        
-        -- Place enemy at new position
-        Enemy.placeOnGrid(enemy, gameGrid)
-        
-        return true
-    end
-    
-    return false
+    -- Use inherited moveTo method
+    return enemy:moveTo(newX, newY, gameGrid, gridWidth, gridHeight)
 end
 
 -- AI behavior for a single enemy (delegates to AI module)
@@ -165,13 +150,11 @@ end
 
 -- Place enemy on the game grid at their current position
 function Enemy.placeOnGrid(enemy, gameGrid)
-    gameGrid[enemy.y][enemy.x] = {
-        char = enemy.char,
-        color = Colors.get(enemy.color),
-        walkable = false,
-        isEnemy = true,
-        enemy = enemy -- Reference to the enemy object
-    }
+    Creature.placeOnGrid(enemy, gameGrid)
+
+    -- Add enemy-specific properties to the grid cell
+    gameGrid[enemy.y][enemy.x].isEnemy = true
+    gameGrid[enemy.y][enemy.x].enemy = enemy -- Reference to the enemy object
 end
 
 -- Spawn enemies in random walkable locations
@@ -198,27 +181,6 @@ function Enemy.spawnRandom(gameGrid, gridWidth, gridHeight, count, enemyType, cu
     end
     
     return spawned
-end
-
--- Check if there's an enemy at the given position
-function Enemy.getEnemyAt(x, y)
-    for _, enemy in ipairs(enemies) do
-        if enemy.x == x and enemy.y == y and enemy.healthManager.health > 0 then
-            return enemy
-        end
-    end
-    return nil
-end
-
--- Get enemy count by type
-function Enemy.getCount(enemyType)
-    local count = 0
-    for _, enemy in ipairs(enemies) do
-        if enemy.type == enemyType and enemy.healthManager.health > 0 then
-            count = count + 1
-        end
-    end
-    return count
 end
 
 -- Get total living enemy count
