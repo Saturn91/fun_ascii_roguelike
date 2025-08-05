@@ -1,3 +1,6 @@
+Char = require("asciiEngine.char")
+AsciiGrid = require("asciiEngine.asciiGrid")
+
 local AsciiEngine = {}
 
 AsciiEngine.__index = AsciiEngine
@@ -20,6 +23,7 @@ function AsciiEngine:new(options)
     
     -- Layers system
     instance.layers = {}
+    instance.layerLookUp = {}
     
     -- Initialize font if provided
     if instance.font then
@@ -47,11 +51,8 @@ function AsciiEngine:setGridSize(cols, rows)
     self.gridRows = rows
     self:calculateScaling()
     
-    -- Reinitialize all layers with new grid size
     for _, layer in ipairs(self.layers) do
-        if layer.initialize then
-            layer:initialize(self)
-        end
+        layer:initialize(self)
     end
 end
 
@@ -79,39 +80,33 @@ function AsciiEngine:calculateScaling()
 end
 
 function AsciiEngine:addLayer(layer)
-    if layer.initialize then
-        layer:initialize(self)
-    end
+    layer:initialize(self)
+    if self.layerLookUp[layer.id] then error("Layer with id '" .. layer.id .. "' already exists") end
+    self.layerLookUp[layer.id] = layer
     table.insert(self.layers, layer)
 end
 
 function AsciiEngine:draw()
-    -- Save current graphics state
     love.graphics.push()
     
-    -- Apply scaling and offset
     love.graphics.translate(self.offsetX, self.offsetY)
     love.graphics.scale(self.scale, self.scale)
 
     love.graphics.setFont(self.font)
     
-    -- Draw all layers
     for _, layer in ipairs(self.layers) do
         if layer.draw then
             layer:draw()
         end
     end
     
-    -- Restore graphics state
     love.graphics.pop()
 end
 
 function AsciiEngine:screenToGrid(screenX, screenY)
-    -- Convert screen coordinates to grid coordinates
     local gridX = math.floor((screenX - self.offsetX) / (self.charWidth * self.scale)) + 1
     local gridY = math.floor((screenY - self.offsetY) / (self.charHeight * self.scale)) + 1
     
-    -- Clamp to grid bounds
     gridX = math.max(1, math.min(self.gridCols, gridX))
     gridY = math.max(1, math.min(self.gridRows, gridY))
     
@@ -119,7 +114,6 @@ function AsciiEngine:screenToGrid(screenX, screenY)
 end
 
 function AsciiEngine:gridToScreen(gridX, gridY)
-    -- Convert grid coordinates to screen coordinates
     local screenX = (gridX - 1) * self.charWidth * self.scale + self.offsetX
     local screenY = (gridY - 1) * self.charHeight * self.scale + self.offsetY
     
@@ -127,7 +121,6 @@ function AsciiEngine:gridToScreen(gridX, gridY)
 end
 
 function AsciiEngine:resize()
-    -- Recalculate scaling when window is resized
     self:calculateScaling()
 end
 
@@ -141,6 +134,10 @@ end
 
 function AsciiEngine:getScale()
     return self.scale
+end
+
+function AsciiEngine:getLayerById(id)
+    return self.layerLookUp[id]
 end
 
 return AsciiEngine

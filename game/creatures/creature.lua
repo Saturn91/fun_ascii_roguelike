@@ -1,6 +1,6 @@
 local Creature = {}
 local HealthManager = require("game.creatures.HealthManager")
-local Colors = require("Colors")
+local Colors = require("colors")
 
 -- Import InventoryController from global (defined in __index.lua)
 -- This avoids circular dependency issues

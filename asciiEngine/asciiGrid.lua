@@ -2,14 +2,15 @@ local AsciiGrid = {}
 
 AsciiGrid.__index = AsciiGrid
 
-function AsciiGrid:new()
-    return setmetatable({}, self)
+function AsciiGrid:new(id)
+    if id == nil then error("AsciiGrid requires an id") end
+    return setmetatable({id = id}, self)
 end
 
 function AsciiGrid:initialize(engine)
     self.engine = engine
     self.cells = {}
-    
+
     local cols, rows = engine:getGridSize()
     
     -- Initialize grid cells
