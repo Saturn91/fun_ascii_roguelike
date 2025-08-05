@@ -10,7 +10,9 @@ Log = require("game.ui.Logger")
 -- Import game modules
 Colors = require("Colors")
 local Fonts = require("fonts")
-local AsciiGrid = require("asciiGrid")
+local AsciiEngine = require("asciiEngine.engine")
+local AsciiGrid = require("asciiEngine.asciiGrid")
+local GridAdapter = require("gridAdapter")
 local Game = require("game.__index")
 local UI = require("game.ui")
 local Controls = require("game.controls")
@@ -20,30 +22,55 @@ require("util._index")
 require("sandbox/Sandbox")
 Sandbox.init()
 
+-- ASCII Engine variables
+local engine = nil
+local grid = nil
+local gameGrid = nil -- Compatibility grid adapter
+
 function love.load()
      Log.log("[gold]Welcome human![/gold] Lets get started")
 
     -- Initialize configuration manager first
     ConfigManager.load()
     
-    -- Set up the game window
-    love.window.setTitle("ASCII Roguelike")
-    
     -- Initialize font system
-    local fontSize = 12
-    font, fontName, charWidth, charHeight = Fonts.init(fontSize)
+    font, fontName, charWidth, charHeight = Fonts.init(12)
     
     -- Set up game grid dimensions
     local windowWidth = 1024
     local windowHeight = 768
-    love.window.setMode(windowWidth, windowHeight)
+    love.window.setMode(windowWidth, windowHeight, {resizable = true})
     
-    -- Calculate initial grid dimensions for UI system
+    -- Calculate grid dimensions for the ASCII engine
     local tempGridWidth = math.floor(windowWidth / charWidth)
     local tempGridHeight = math.floor(windowHeight / charHeight)
     
-    -- Initialize ASCII grid system (full screen for menu)
-    gameGrid, gridWidth, gridHeight = AsciiGrid.init(windowWidth, windowHeight, charWidth, charHeight, tempGridWidth, tempGridHeight)
+    -- Initialize ASCII Engine with calculated font
+    engine = AsciiEngine:new({
+        gridCols = 146,
+        gridRows = 54,
+        font = love.graphics.newFont("assets/fonts/Ac437_IBM_BIOS.ttf", 240)
+    })
+
+    -- Create and add a grid layer
+    grid = AsciiGrid:new()
+    engine:addLayer(grid)
+    
+    -- Create compatibility grid adapter
+    gameGrid = GridAdapter:new(grid, engine)
+    
+    -- Calculate initial scaling
+    engine:calculateScaling()
+    
+    -- Store engine references globally for other modules
+    _G.asciiEngine = engine
+    _G.asciiGrid = grid
+    _G.gameGrid = gameGrid -- Make gameGrid global for backward compatibility
+    
+    -- Get grid dimensions from engine and make them global
+    gridWidth, gridHeight = engine:getGridSize()
+    _G.gridWidth = gridWidth
+    _G.gridHeight = gridHeight
     
     -- Initialize game state and menu
     Game.init()
@@ -62,11 +89,14 @@ function love.draw()
     -- Clear screen with black background
     love.graphics.clear(0, 0, 0, 1)
     
+    -- Clear the grid first
+    gameGrid:clear()
+    
     if GameState.isMenu() then
         -- Draw menu with dynamic background
         Menu.draw(gameGrid, gridWidth, gridHeight, love.timer.getDelta())
     elseif GameState.isPlaying() then
-        -- Draw the UI (this modifies the gameGrid to include UI elements)
+        -- Draw the UI (this modifies the grid to include UI elements)
         UI.draw(gameGrid, player)
     elseif GameState.isPaused() then
         -- First draw the game as it was when paused
@@ -76,8 +106,8 @@ function love.draw()
         UI.draw(gameGrid, player)
     end
     
-    -- Draw the ASCII grid
-    AsciiGrid.draw()
+    -- Draw the ASCII engine (includes all layers)
+    engine:draw()
     
     -- If paused, draw the Love2D overlay on top
     if GameState.isPaused() then
@@ -116,11 +146,11 @@ function startNewGame()
     -- Clear menu background before starting game
     Menu.clearBackground()
     
+    -- Clear the grid
+    gameGrid:clear()
+    
     -- Initialize UI system and get adjusted game area dimensions
     gameAreaWidth, gameAreaHeight = UI.init(gridWidth, gridHeight, charWidth, charHeight)
-    
-    -- Reinitialize ASCII grid system with game area boundaries
-    gameGrid, gridWidth, gridHeight = AsciiGrid.init(love.graphics.getWidth(), love.graphics.getHeight(), charWidth, charHeight, gameAreaWidth, gameAreaHeight)
     
     -- Set up UI reference for Player and Enemy modules
     Player.setUI(UI)
@@ -159,12 +189,19 @@ function returnToMainMenu()
     -- Clear any enemies
     Enemy.clear()
     
+    -- Clear the grid
+    gameGrid:clear()
+    
     -- Reinitialize menu
     Menu.init()
     
-    -- Reinitialize ASCII grid system for menu (full screen)
-    gameGrid, gridWidth, gridHeight = AsciiGrid.init(love.graphics.getWidth(), love.graphics.getHeight(), charWidth, charHeight, math.floor(love.graphics.getWidth() / charWidth), math.floor(love.graphics.getHeight() / charHeight))
-    
     -- Switch to menu state
     GameState.setState(GameState.STATES.MENU)
+end
+
+function love.resize(w, h)
+    -- Recalculate engine scaling when window is resized
+    if engine then
+        engine:resize()
+    end
 end

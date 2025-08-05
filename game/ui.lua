@@ -49,6 +49,11 @@ function UI.init(gridWidth, gridHeight, charWidth, charHeight)
         height = UI.totalHeight - LOG_HEIGHT - 1  -- Reduced by log height + health bar
     }
     
+    -- Update grid adapter with game area dimensions
+    if _G.gameGrid and _G.gameGrid.setGameAreaDimensions then
+        _G.gameGrid:setGameAreaDimensions(UI.gameAreaWidth, UI.gameArea.height)
+    end
+    
     -- UI area (sidebar on right, full height)
     UI.uiArea = {
         x = UI.gameAreaWidth + 1,
