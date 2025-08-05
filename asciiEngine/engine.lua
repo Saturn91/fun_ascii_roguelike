@@ -85,14 +85,6 @@ function AsciiEngine:addLayer(layer)
     table.insert(self.layers, layer)
 end
 
-function AsciiEngine:update(dt)
-    for _, layer in ipairs(self.layers) do
-        if layer.update then
-            layer:update(dt)
-        end
-    end
-end
-
 function AsciiEngine:draw()
     -- Save current graphics state
     love.graphics.push()
