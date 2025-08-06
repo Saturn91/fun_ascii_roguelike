@@ -20,19 +20,16 @@ function DefaultMapDefinition.createSimpleRoom(width, height)
             end
         end
     end
-    
-    -- Create map definition object manually to bypass validation bug
-    local mapDefinition = {
+
+    return MapDefinition:new({
         height = height,
-        walkable = walkable,
         width = width,
-        options = {},
-        tileDefinitions = {[1] = ".", [2] = "█"},
+        walkable = walkable
+    }, {
+        tileDefinitions = {[1] = { glyph = ",", color = {0, 0.2, 0, 1} }, [2] = { glyph = "█", color = {0.5, 0.5, 0.5, 1} }},
         tileIds = {[1] = "floor", [2] = "wall"},
         tileMap = tileMap
-    }
-    
-    return mapDefinition
+    })
 end
 
 return DefaultMapDefinition

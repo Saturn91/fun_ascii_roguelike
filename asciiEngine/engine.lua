@@ -1,4 +1,4 @@
-Char = require("asciiEngine.char")
+GridChar = require("asciiEngine.GridChar")
 AsciiGrid = require("asciiEngine.asciiGrid")
 
 local AsciiEngine = {}

@@ -1,4 +1,4 @@
-local AsciiRoomGeneratorUtil = {}
+AsciiRoomGeneratorUtil = {}
 
 function AsciiRoomGeneratorUtil.generateRoom(width, height, floorChar, wallChar)
     local room = {}

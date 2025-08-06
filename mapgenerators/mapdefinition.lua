@@ -10,7 +10,7 @@ function MapDefinition:new(parameters, options)
     local instance = setmetatable(parameters, self)
     instance.options = {}
     instance.options.rooms = options.rooms
-    instance.tileDefinitions = options.tileDefinitions or {".", "█"}
+    instance.tileDefinitions = options.tileDefinitions or {Char:new("."), Char:new("█")}
     instance.tileIds = options.tileIds or {"floor", "wall"}
     instance.tileMap = options.tileMap or AsciiRoomGeneratorUtil.generateRoom(parameters.width, parameters.height)
 
@@ -38,6 +38,8 @@ end
 
 function MapDefinition.validateTileMap(mapDefinition)
     if not mapDefinition.tileMap or #mapDefinition.tileMap ~= mapDefinition.height then
+        print("yop")
+        print(json.stringify({ map = mapDefinition.tileMap}))
         return "Tile map is missing or does not match the height of the map definition."
     end
 
@@ -50,19 +52,23 @@ function MapDefinition.validateTileMap(mapDefinition)
     local usedChars = {}
     for y = 1, #mapDefinition.tileMap do
         for x = 1, #mapDefinition.tileMap[y] do
-            local char = mapDefinition.tileMap[y][x]
-            if not char or type(char) ~= "number" then 
-                return "Tile map contains invalid character at (" .. x .. ", " .. y .. "). <" .. tostring(char) .. "> - can only contain numbers."
+            local charID = mapDefinition.tileMap[y][x]
+            if not charID or type(charID) ~= "number" then
+                return "Tile map contains invalid character at (" .. x .. ", " .. y .. "). <" .. tostring(charID) .. "> - can only contain numbers."
             end
-            if not usedChars[char] then
-                usedChars[char] = true
+            if not usedChars[charID] then
+                usedChars[charID] = true
             end
         end
     end
 
-    for index, char in pairs(usedChars) do
+    for index in pairs(usedChars) do
         if not mapDefinition.tileDefinitions[index] then
             return "Tile map uses character '" .. index .. "' that is not defined in tileDefinitions."
+        end
+
+        if not mapDefinition.tileDefinitions[index].glyph or not mapDefinition.tileDefinitions[index].color then
+            return "Tile definition for character '" .. index .. "' is missing glyph or color."
         end
     end
 

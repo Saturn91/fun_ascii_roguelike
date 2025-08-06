@@ -4,6 +4,7 @@
 DefaultMapDefinition = require("mapgenerators.DefaultMapDefinition")
 AsciiGrid = require("asciiEngine.asciiGrid")
 MapAdapter = require("mapgenerators.MapAdapter")
+MapDefinition = require("mapgenerators.mapdefinition")
 
 function run(test)
     
@@ -19,7 +20,13 @@ function run(test)
             {2, 1, 2},
             {2, 2, 2}
         },
-        tileDefinitions = {[1] = ".", [2] = "█"}
+        tileDefinitions = {[1] = {
+            glyph = ".",
+            color = {0, 1, 0, 1}
+        }, [2] = {
+            glyph = "█",
+            color = {0.5, 0.5, 0.5, 1}
+        }},
     }
     
     local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(mockMap, "testLayer", 0, 0)
@@ -50,8 +57,8 @@ function run(test)
     test.assert_equal(15, defaultSizeMap.height, "Default height should be 15")
     
     -- Test tile definitions
-    test.assert_equal(".", map.tileDefinitions[1], "Floor tile should be correct")
-    test.assert_equal("█", map.tileDefinitions[2], "Wall tile should be correct")
+    test.assert_equal(map.tileDefinitions[1].glyph, ",", "Floor tile should be correct")
+    test.assert_equal(map.tileDefinitions[2].glyph, "█", "Wall tile should be correct")
     test.assert_equal("floor", map.tileIds[1], "Floor tile ID should be correct")
     test.assert_equal("wall", map.tileIds[2], "Wall tile ID should be correct")
     

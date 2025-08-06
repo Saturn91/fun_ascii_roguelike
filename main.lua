@@ -3,21 +3,17 @@ require("mainImports")
 GAMESTATE = {}
 
 function love.load()
-    love.window.setMode(800, 600, {resizable = true})
+    love.window.setMode(800, 600, {resizable = true, fullscreen = true})
 
     initializeEngine()
 
-    local defaultMap = DefaultMapDefinition.createSimpleRoom(146, 54)
-    local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(defaultMap, "mapLayer", 0, 0)
-    GAMESTATE.engine:addLayer(mapLayer)
-    populateLayer(GAMESTATE.engine)
-
-    GAMESTATE.engine:getLayerById("layer2"):writeText(40, 10, "Welcome to the ASCII Roguelike!", {1, 1, 1})
+    GAMESTATE.engine:getLayerById("layer2"):writeText(40, 10, "Welcome to the ASCII Roguelike!", {0, 1, 0})
 end
 
 function love.draw()
-    love.graphics.clear(0, 0, 0)
+    love.graphics.clear(0, 0.0, 0)
     GAMESTATE.engine:draw()
+    CRT.apply()
 end
 
 function love.resize(w, h)
@@ -26,12 +22,17 @@ end
 
 function initializeEngine()
     GAMESTATE.engine = AsciiEngine:new({
-        gridCols = 146,
-        gridRows = 54,
+        gridCols = 120,
+        gridRows = 66,
         font = Fonts["ibm-mono"]
     })
     
-    GAMESTATE.engine:addLayer(AsciiGrid:new("main"))
+    local gridCols, gridRows = GAMESTATE.engine:getGridSize()
+    local defaultMap = DefaultMapDefinition.createSimpleRoom(gridCols, gridRows)
+    local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(defaultMap, "main", 0, 0)
+    GAMESTATE.engine:addLayer(mapLayer)
+    populateLayer(GAMESTATE.engine)
+
     GAMESTATE.engine:addLayer(AsciiGrid:new("layer2")) -- used for popups and overlays
     GAMESTATE.engine:calculateScaling()
 end

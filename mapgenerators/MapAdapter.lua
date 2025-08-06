@@ -32,7 +32,7 @@ function MapAdapter.createLayerFromMapDefinition(mapDefinition, layerId, offsetX
                     
                     local cols, rows = engine:getGridSize()
                     if screenX >= 1 and screenX <= cols and screenY >= 1 and screenY <= rows then
-                        layer:setCell(screenX, screenY, tileChar, {1, 1, 1}, nil)
+                        layer:setCell(screenX, screenY, tileChar.glyph, tileChar.color, nil)
                     end
                 end
             end

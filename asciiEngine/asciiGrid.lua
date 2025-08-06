@@ -17,7 +17,7 @@ function AsciiGrid:initialize(engine)
     for y = 1, rows do
         self.cells[y] = {}
         for x = 1, cols do
-            self.cells[y][x] = require("asciiEngine.char"):new(x, y)
+            self.cells[y][x] = GridChar:new(x, y)
         end
     end
 end
