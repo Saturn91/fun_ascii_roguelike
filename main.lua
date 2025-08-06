@@ -7,14 +7,12 @@ function love.load()
 
     initializeEngine()
 
-    -- test grid
-    GAMESTATE.engine:getLayerById("main"):drawBorder("█", {0.8, 0.8, 0.8})
-    local text = "Welcome to the ASCII Roguelike!"
-    for i = 1, #text + 2 do
-        GAMESTATE.engine:getLayerById("main"):setCell(10 + i - 2, 10, "█", {1, 0, 0}, {0, 0, 0})
-    end
-    GAMESTATE.engine:getLayerById("main"):setCell(10, 10, "█", {1, 0, 0}, {0, 0, 0})
-    GAMESTATE.engine:getLayerById("layer2"):writeText(10, 10, text, {1, 1, 1})
+    local defaultMap = DefaultMapDefinition.createSimpleRoom(146, 54)
+    local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(defaultMap, "mapLayer", 0, 0)
+    GAMESTATE.engine:addLayer(mapLayer)
+    populateLayer(GAMESTATE.engine)
+
+    GAMESTATE.engine:getLayerById("layer2"):writeText(40, 10, "Welcome to the ASCII Roguelike!", {1, 1, 1})
 end
 
 function love.draw()

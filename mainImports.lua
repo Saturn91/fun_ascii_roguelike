@@ -1,6 +1,9 @@
 AsciiEngine = require("asciiEngine.engine")
-Fonts = require("fonts")
 Colors = require("colors")
+DefaultMapDefinition = require("mapgenerators.DefaultMapDefinition")
+Fonts = require("fonts")
+MapAdapter = require("mapgenerators.MapAdapter")
+MapDefinition = require("mapgenerators.mapdefinition")
 require("util._index")
 
 require("sandbox/Sandbox")
