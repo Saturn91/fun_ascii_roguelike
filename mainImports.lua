@@ -5,6 +5,7 @@ DefaultMapDefinition = require("mapgenerators.DefaultMapDefinition")
 Fonts = require("fonts")
 MapAdapter = require("mapgenerators.MapAdapter")
 MapDefinition = require("mapgenerators.mapdefinition")
+RoomsAndCorridors = require("mapgenerators.generators.RoomsAndCorridors")
 require("util._index")
 
 require("sandbox/Sandbox")

@@ -28,8 +28,8 @@ function initializeEngine()
     })
     
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
-    local defaultMap = DefaultMapDefinition.createSimpleRoom(gridCols, gridRows)
-    local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(defaultMap, "main", 0, 0)
+    local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
+    local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(generatedMap, "main", 0, 0)
     GAMESTATE.engine:addLayer(mapLayer)
     populateLayer(GAMESTATE.engine)
 
