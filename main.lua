@@ -2,12 +2,14 @@ require("mainImports")
 
 GAMESTATE = {}
 
+local currentMapType = ""
+
 function love.load()
-    love.window.setMode(800, 600, {resizable = true, fullscreen = true})
+    love.window.setMode(800, 600, {resizable = true})
 
     initializeEngine()
 
-    GAMESTATE.engine:getLayerById("layer2"):writeText(40, 10, "Welcome to the ASCII Roguelike!", {0, 1, 0})
+    GAMESTATE.engine:getLayerById("layer2"):writeText(40, 1, "Map type: " .. currentMapType, {0, 1, 0})
 end
 
 function love.draw()
@@ -23,13 +25,24 @@ end
 function love.keyreleased(key)
     if key == "space" then
         regenerateMap()
+        GAMESTATE.engine:getLayerById("layer2"):clear()
+        GAMESTATE.engine:getLayerById("layer2"):writeText(40, 1, "Map type: " .. currentMapType, {0, 1, 0})
     end
 end
 
 function regenerateMap()
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
-    local generatedMap = BinarySpacePartitioning.generate(gridCols, gridRows)
-    GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
+    --either use RoomsAndCorridors or BinarySpacePartitioning based on random choice
+    if love.math.random() < 0.5 then
+        local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
+        GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
+        currentMapType = "RoomsAndCorridors"
+    else
+        -- Use BinarySpacePartitioning for map generation
+        local generatedMap = BinarySpacePartitioning.generate(gridCols, gridRows)
+        GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
+        currentMapType = "BinarySpacePartitioning"
+    end
 end
 
 function initializeEngine()
@@ -38,6 +51,8 @@ function initializeEngine()
         gridRows = 66,
         font = Fonts["ibm-mono"]
     })
+
+    currentMapType = "RoomsAndCorridors"
     
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
     local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
