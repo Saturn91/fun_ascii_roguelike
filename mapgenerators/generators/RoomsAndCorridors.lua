@@ -90,7 +90,83 @@ function RoomsAndCorridors.generateRooms(width, height, walkable)
         end
     end
     
+    -- Fill large open spaces with additional smaller rooms
+    RoomsAndCorridors.fillOpenSpaces(rooms, walkable, width, height)
+    
     return rooms
+end
+
+function RoomsAndCorridors.fillOpenSpaces(rooms, walkable, width, height)
+    local minFillSize = 4
+    local maxFillSize = 8
+    local maxFillAttempts = 200
+    local gridSize = 8
+    
+    -- Divide map into grid sections and check for empty areas
+    for gridY = 1, math.floor(height / gridSize) do
+        for gridX = 1, math.floor(width / gridSize) do
+            local startX = (gridX - 1) * gridSize + 1
+            local startY = (gridY - 1) * gridSize + 1
+            local endX = math.min(startX + gridSize - 1, width)
+            local endY = math.min(startY + gridSize - 1, height)
+            
+            -- Check if this grid area is mostly empty
+            if RoomsAndCorridors.isAreaMostlyEmpty(startX, startY, endX, endY, walkable, rooms) then
+                -- Try to place a smaller room in this area
+                for attempt = 1, 20 do
+                    local roomWidth = love.math.random(minFillSize, maxFillSize)
+                    local roomHeight = love.math.random(minFillSize, maxFillSize)
+                    local roomX = love.math.random(startX, math.max(startX, endX - roomWidth))
+                    local roomY = love.math.random(startY, math.max(startY, endY - roomHeight))
+                    
+                    local room = {
+                        centerX = roomX + math.floor(roomWidth / 2),
+                        centerY = roomY + math.floor(roomHeight / 2),
+                        height = roomHeight,
+                        width = roomWidth,
+                        x = roomX,
+                        y = roomY
+                    }
+                    
+                    if RoomsAndCorridors.canPlaceRoom(room, rooms, width, height) then
+                        RoomsAndCorridors.carveRoom(room, walkable)
+                        table.insert(rooms, room)
+                        break
+                    end
+                end
+            end
+        end
+    end
+end
+
+function RoomsAndCorridors.isAreaMostlyEmpty(startX, startY, endX, endY, walkable, rooms)
+    local totalCells = (endX - startX + 1) * (endY - startY + 1)
+    local occupiedCells = 0
+    
+    -- Count walkable cells (floors and corridors)
+    for y = startY, endY do
+        for x = startX, endX do
+            if walkable[y] and walkable[y][x] then
+                occupiedCells = occupiedCells + 1
+            end
+        end
+    end
+    
+    -- Count room overlap
+    for _, room in ipairs(rooms) do
+        local overlapStartX = math.max(startX, room.x)
+        local overlapStartY = math.max(startY, room.y)
+        local overlapEndX = math.min(endX, room.x + room.width - 1)
+        local overlapEndY = math.min(endY, room.y + room.height - 1)
+        
+        if overlapStartX <= overlapEndX and overlapStartY <= overlapEndY then
+            local overlapArea = (overlapEndX - overlapStartX + 1) * (overlapEndY - overlapStartY + 1)
+            occupiedCells = occupiedCells + overlapArea
+        end
+    end
+    
+    -- Area is mostly empty if less than 20% is occupied
+    return (occupiedCells / totalCells) < 0.2
 end
 
 function RoomsAndCorridors.canPlaceRoom(newRoom, existingRooms, mapWidth, mapHeight)
