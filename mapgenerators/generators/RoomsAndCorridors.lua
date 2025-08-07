@@ -66,7 +66,7 @@ end
 function RoomsAndCorridors.generateRooms(width, height, walkable)
     local rooms = {}
     local maxAttempts = 100
-    local minRoomSize = 4
+    local minRoomSize = 8
     local maxRoomSize = 12
     
     for attempt = 1, maxAttempts do
