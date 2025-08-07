@@ -1,4 +1,5 @@
 AsciiEngine = require("asciiEngine.engine")
+BinarySpacePartitioning = require("mapgenerators.generators.BinarySpacePartitioning")
 Colors = require("colors")
 CRT = require("shaders.crt")
 DefaultMapDefinition = require("mapgenerators.DefaultMapDefinition")

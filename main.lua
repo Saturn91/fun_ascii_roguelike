@@ -28,7 +28,7 @@ end
 
 function regenerateMap()
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
-    local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
+    local generatedMap = BinarySpacePartitioning.generate(gridCols, gridRows)
     GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
 end
 
