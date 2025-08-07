@@ -3,6 +3,7 @@
 
 DefaultMapDefinition = require("mapgenerators.DefaultMapDefinition")
 AsciiGrid = require("asciiEngine.asciiGrid")
+GridChar = require("asciiEngine.GridChar")
 MapAdapter = require("mapgenerators.MapAdapter")
 MapDefinition = require("mapgenerators.mapdefinition")
 
@@ -29,15 +30,46 @@ function run(test)
         }},
     }
     
-    local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(mockMap, "testLayer", 0, 0)
+    -- Test new object-oriented approach
+    local mapAdapter = MapAdapter.new(mockMap, "testLayer", 0, 0)
     
-    test.assert_equal("testLayer", mapLayer.id, "Layer should have correct id")
-    test.assert_equal("function", type(populateLayer), "Should return a populate function")
+    test.assert_equal("testLayer", mapAdapter.layer.id, "MapAdapter layer should have correct id")
+    test.assert_equal("testLayer", mapAdapter.layerId, "MapAdapter layerId field should be correct")
+    test.assert_equal(0, mapAdapter.offsetX, "MapAdapter offsetX should be correct")
+    test.assert_equal(0, mapAdapter.offsetY, "MapAdapter offsetY should be correct")
+    test.assert_equal(mockMap, mapAdapter.mapDefinition, "MapAdapter should store mapDefinition")
     
     -- Test with offset
-    local mapLayerWithOffset, populateLayerWithOffset = MapAdapter.createLayerFromMapDefinition(mockMap, "offsetLayer", 5, 3)
-    test.assert_equal("offsetLayer", mapLayerWithOffset.id, "Layer with offset should have correct id")
-    test.assert_equal("function", type(populateLayerWithOffset), "Layer with offset should return a populate function")
+    local mapAdapterWithOffset = MapAdapter.new(mockMap, "offsetLayer", 5, 3)
+    test.assert_equal("offsetLayer", mapAdapterWithOffset.layer.id, "MapAdapter with offset should have correct layer id")
+    test.assert_equal(5, mapAdapterWithOffset.offsetX, "MapAdapter offsetX should be correct")
+    test.assert_equal(3, mapAdapterWithOffset.offsetY, "MapAdapter offsetY should be correct")
+    
+    -- Test updateMap method
+    local newMockMap = {
+        width = 2,
+        height = 2,
+        tileMap = {
+            {1, 1},
+            {1, 1}
+        },
+        tileDefinitions = {[1] = {
+            glyph = "o",
+            color = {1, 0, 0, 1}
+        }},
+    }
+    
+    -- Create a mock engine for testing updateMap
+    local mockEngine = {
+        getGridSize = function() return 10, 10 end
+    }
+    
+    -- Initialize the layer first
+    mapAdapter.layer:initialize(mockEngine)
+    mapAdapter:updateMap(newMockMap, mockEngine)
+    test.assert_equal(newMockMap, mapAdapter.mapDefinition, "MapAdapter should update mapDefinition")
+    test.assert_equal(2, mapAdapter.mapDefinition.width, "Updated map should have new width")
+    test.assert_equal(2, mapAdapter.mapDefinition.height, "Updated map should have new height")
     
     -- Test DefaultMapDefinition functionality
     test.newSection("DefaultMapDefinition Tests")
@@ -66,10 +98,12 @@ function run(test)
     test.newSection("MapAdapter Integration Tests")
     
     local integrationMap = DefaultMapDefinition.createSimpleRoom(5, 4)
-    local integrationLayer, integrationPopulate = MapAdapter.createLayerFromMapDefinition(integrationMap, "integrationLayer", 1, 1)
+    local integrationMapAdapter = MapAdapter.new(integrationMap, "integrationLayer", 1, 1)
     
-    test.assert_equal("integrationLayer", integrationLayer.id, "Integration layer should have correct id")
-    test.assert_equal("function", type(integrationPopulate), "Integration should return populate function")
+    test.assert_equal("integrationLayer", integrationMapAdapter.layer.id, "Integration layer should have correct id")
+    test.assert_equal(integrationMap, integrationMapAdapter.mapDefinition, "Integration should store mapDefinition")
+    test.assert_equal(1, integrationMapAdapter.offsetX, "Integration offsetX should be correct")
+    test.assert_equal(1, integrationMapAdapter.offsetY, "Integration offsetY should be correct")
     
 end
 

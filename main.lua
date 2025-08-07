@@ -20,6 +20,18 @@ function love.resize(w, h)
     GAMESTATE.engine:resize()
 end
 
+function love.keyreleased(key)
+    if key == "space" then
+        regenerateMap()
+    end
+end
+
+function regenerateMap()
+    local gridCols, gridRows = GAMESTATE.engine:getGridSize()
+    local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
+    GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
+end
+
 function initializeEngine()
     GAMESTATE.engine = AsciiEngine:new({
         gridCols = 120,
@@ -29,9 +41,9 @@ function initializeEngine()
     
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
     local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
-    local mapLayer, populateLayer = MapAdapter.createLayerFromMapDefinition(generatedMap, "main", 0, 0)
-    GAMESTATE.engine:addLayer(mapLayer)
-    populateLayer(GAMESTATE.engine)
+    GAMESTATE.mapAdapter = MapAdapter.new(generatedMap, "main", 0, 0)
+    GAMESTATE.engine:addLayer(GAMESTATE.mapAdapter.layer)
+    GAMESTATE.mapAdapter:populate(GAMESTATE.engine)
 
     GAMESTATE.engine:addLayer(AsciiGrid:new("layer2")) -- used for popups and overlays
     GAMESTATE.engine:calculateScaling()
