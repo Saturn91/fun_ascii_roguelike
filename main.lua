@@ -32,16 +32,16 @@ end
 
 function regenerateMap()
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
-    --either use RoomsAndCorridors or BinarySpacePartitioning based on random choice
+    --either use RoomsAndCorridors or CaveSystem based on random choice
     if love.math.random() < 0.5 then
         local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
         GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
         currentMapType = "RoomsAndCorridors"
     else
-        -- Use BinarySpacePartitioning for map generation
-        local generatedMap = BinarySpacePartitioning.generate(gridCols, gridRows)
+        -- Use CaveSystem for map generation
+        local generatedMap = CaveSystem.generate(gridCols, gridRows)
         GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
-        currentMapType = "BinarySpacePartitioning"
+        currentMapType = "CaveSystem"
     end
 end
 
@@ -52,10 +52,10 @@ function initializeEngine()
         font = Fonts["ibm-mono"]
     })
 
-    currentMapType = "RoomsAndCorridors"
+    currentMapType = "CaveSystem"
     
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
-    local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
+    local generatedMap = CaveSystem.generate(gridCols, gridRows)
     GAMESTATE.mapAdapter = MapAdapter.new(generatedMap, "main", 0, 0)
     GAMESTATE.engine:addLayer(GAMESTATE.mapAdapter.layer)
     GAMESTATE.mapAdapter:populate(GAMESTATE.engine)
