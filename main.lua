@@ -32,13 +32,12 @@ end
 
 function regenerateMap()
     local gridCols, gridRows = GAMESTATE.engine:getGridSize()
-    --either use RoomsAndCorridors or CaveSystem based on random choice
+    
     if love.math.random() < 0.5 then
         local generatedMap = RoomsAndCorridors.generate(gridCols, gridRows)
         GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
         currentMapType = "RoomsAndCorridors"
     else
-        -- Use CaveSystem for map generation
         local generatedMap = CaveSystem.generate(gridCols, gridRows)
         GAMESTATE.mapAdapter:updateMap(generatedMap, GAMESTATE.engine)
         currentMapType = "CaveSystem"
