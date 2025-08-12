@@ -9,8 +9,8 @@ function love.load()
 
     initializeEngine()
 
-    GAMESTATE.engine:getLayerById("creatures"):setCell(1, 1, "@")
-    GAMESTATE.engine:getLayerById("ui"):writeText(40, 1, "Map type: " .. currentMapType, {0, 1, 0})
+    GAMESTATE.engine:getLayerById(GAMESTATE.GRIDLAYERS.CREATURES):setCell(1, 1, "@")
+    GAMESTATE.engine:getLayerById(GAMESTATE.GRIDLAYERS.UI):writeText(40, 1, "Map type: " .. currentMapType, {0, 1, 0})
 end
 
 function love.draw()
@@ -26,8 +26,8 @@ end
 function love.keyreleased(key)
     if key == "space" then
         regenerateMap()
-        GAMESTATE.engine:getLayerById("ui"):clear()
-        GAMESTATE.engine:getLayerById("ui"):writeText(40, 1, "Map type: " .. currentMapType, {0, 1, 0})
+        GAMESTATE.engine:getLayerById(GAMESTATE.GRIDLAYERS.UI):clear()
+        GAMESTATE.engine:getLayerById(GAMESTATE.GRIDLAYERS.UI):writeText(40, 1, "Map type: " .. currentMapType, {0, 1, 0})
     end
 end
 
@@ -46,6 +46,11 @@ function regenerateMap()
 end
 
 function initializeEngine()
+    GAMESTATE.GRIDLAYERS = {
+        CREATURES = "creatures",
+        UI = "ui"
+    }
+
     GAMESTATE.engine = AsciiEngine:new({
         gridCols = 120,
         gridRows = 66,
@@ -60,8 +65,8 @@ function initializeEngine()
     GAMESTATE.engine:addLayer(GAMESTATE.mapAdapter.layer)
     GAMESTATE.mapAdapter:populate(GAMESTATE.engine)
 
-    GAMESTATE.engine:addLayer(AsciiGrid:new("creatures")) -- used for the map
+    GAMESTATE.engine:addLayer(AsciiGrid:new(GAMESTATE.GRIDLAYERS.CREATURES)) -- used for the map
 
-    GAMESTATE.engine:addLayer(AsciiGrid:new("ui")) -- used for popups and overlays
+    GAMESTATE.engine:addLayer(AsciiGrid:new(GAMESTATE.GRIDLAYERS.UI)) -- used for popups and overlays
     GAMESTATE.engine:calculateScaling()
 end
