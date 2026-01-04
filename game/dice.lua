@@ -1,7 +1,7 @@
 local Dice = {}
 
 -- Parse dice formula and return dice size, dice amount, and constant modifier
--- Returns: diceSize, diceAmount, constant
+-- Returns: diceSize, diceAmount, modifier
 function Dice.getDicesFromFormula(diceFormula)
     if not diceFormula then
         return nil, nil, nil
@@ -50,8 +50,7 @@ function Dice.getDicesFromFormula(diceFormula)
 end
 
 -- dice formula can be "2d6" "d6" "2d6+3"
-function Dice.roll(diceFormula, diceCount)
-    -- If no formula provided, use diceCount and default as fallback
+function Dice.roll(diceFormula)
     if not Dice.validateFormula(diceFormula) then
         Log.log("[error]invalid dice markup " .. (diceFormula or "nil") .. "[/error]")
         return
@@ -66,10 +65,8 @@ function Dice.roll(diceFormula, diceCount)
         total = total + love.math.random(1, diceSize)
     end
     
-    -- Apply modifier
     total = total + modifier
     
-    -- Ensure minimum result is 1
     return math.max(1, total)
 end
 
