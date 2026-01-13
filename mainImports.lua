@@ -1,0 +1,13 @@
+AsciiEngine = require("asciiEngine.engine")
+CaveSystem = require("mapgenerators.generators.CaveSystem")
+Colors = require("colors")
+CRT = require("shaders.crt")
+DefaultMapDefinition = require("mapgenerators.DefaultMapDefinition")
+Fonts = require("fonts")
+MapAdapter = require("mapgenerators.MapAdapter")
+MapDefinition = require("mapgenerators.mapdefinition")
+RoomsAndCorridors = require("mapgenerators.generators.RoomsAndCorridors")
+require("util._index")
+
+require("sandbox/Sandbox")
+Sandbox.init()

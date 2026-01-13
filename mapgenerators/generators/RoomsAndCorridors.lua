@@ -1,0 +1,313 @@
+local RoomsAndCorridors = {}
+
+function RoomsAndCorridors.generate(width, height)
+    width = width or 80
+    height = height or 50
+    
+    local walkable = RoomsAndCorridors.initializeWalkableMap(width, height)
+    local rooms = RoomsAndCorridors.generateRooms(width, height, walkable)
+    
+    if #rooms > 1 then
+        RoomsAndCorridors.connectRooms(rooms, walkable)
+    end
+    
+    local tileMap = RoomsAndCorridors.createTileMapFromWalkable(walkable, width, height)
+    RoomsAndCorridors.addWalls(tileMap, walkable, width, height)
+    
+    return MapDefinition:new({
+        height = height,
+        width = width,
+        walkable = walkable
+    }, {
+        tileDefinitions = {[1] = { glyph = ".", color = {0.3, 0.3, 0.3, 1} }, [2] = { glyph = "█", color = {0.5, 0.5, 0.5, 1} }, [3] = { glyph = " ", color = {0, 0, 0, 1} }},
+        tileIds = {[1] = "floor", [2] = "wall", [3] = "empty"},
+        tileMap = tileMap,
+        rooms = rooms
+    })
+end
+
+function RoomsAndCorridors.initializeWalkableMap(width, height)
+    local walkable = {}
+    for y = 1, height do
+        walkable[y] = {}
+        for x = 1, width do
+            walkable[y][x] = false
+        end
+    end
+    return walkable
+end
+
+function RoomsAndCorridors.initializeTileMap(width, height)
+    local tileMap = {}
+    for y = 1, height do
+        tileMap[y] = {}
+        for x = 1, width do
+            tileMap[y][x] = 3
+        end
+    end
+    return tileMap
+end
+
+function RoomsAndCorridors.createTileMapFromWalkable(walkable, width, height)
+    local tileMap = {}
+    for y = 1, height do
+        tileMap[y] = {}
+        for x = 1, width do
+            if walkable[y][x] then
+                tileMap[y][x] = 1
+            else
+                tileMap[y][x] = 3
+            end
+        end
+    end
+    return tileMap
+end
+
+function RoomsAndCorridors.generateRooms(width, height, walkable)
+    local rooms = {}
+    local maxAttempts = 100
+    local minRoomSize = 8
+    local maxRoomSize = 12
+    
+    for attempt = 1, maxAttempts do
+        local roomWidth = love.math.random(minRoomSize, maxRoomSize)
+        local roomHeight = love.math.random(minRoomSize, maxRoomSize)
+        local roomX = love.math.random(1, width - roomWidth)
+        local roomY = love.math.random(1, height - roomHeight)
+        
+        local room = {
+            centerX = roomX + math.floor(roomWidth / 2),
+            centerY = roomY + math.floor(roomHeight / 2),
+            height = roomHeight,
+            width = roomWidth,
+            x = roomX,
+            y = roomY
+        }
+        
+        if RoomsAndCorridors.canPlaceRoom(room, rooms, width, height) then
+            RoomsAndCorridors.carveRoom(room, walkable)
+            table.insert(rooms, room)
+        end
+    end
+    
+    -- Fill large open spaces with additional smaller rooms
+    RoomsAndCorridors.fillOpenSpaces(rooms, walkable, width, height)
+    
+    return rooms
+end
+
+function RoomsAndCorridors.fillOpenSpaces(rooms, walkable, width, height)
+    local minFillSize = 4
+    local maxFillSize = 8
+    local maxFillAttempts = 200
+    local gridSize = 8
+    
+    -- Divide map into grid sections and check for empty areas
+    for gridY = 1, math.floor(height / gridSize) do
+        for gridX = 1, math.floor(width / gridSize) do
+            local startX = (gridX - 1) * gridSize + 1
+            local startY = (gridY - 1) * gridSize + 1
+            local endX = math.min(startX + gridSize - 1, width)
+            local endY = math.min(startY + gridSize - 1, height)
+            
+            -- Check if this grid area is mostly empty
+            if RoomsAndCorridors.isAreaMostlyEmpty(startX, startY, endX, endY, walkable, rooms) then
+                -- Try to place a smaller room in this area
+                for attempt = 1, 20 do
+                    local roomWidth = love.math.random(minFillSize, maxFillSize)
+                    local roomHeight = love.math.random(minFillSize, maxFillSize)
+                    local roomX = love.math.random(startX, math.max(startX, endX - roomWidth))
+                    local roomY = love.math.random(startY, math.max(startY, endY - roomHeight))
+                    
+                    local room = {
+                        centerX = roomX + math.floor(roomWidth / 2),
+                        centerY = roomY + math.floor(roomHeight / 2),
+                        height = roomHeight,
+                        width = roomWidth,
+                        x = roomX,
+                        y = roomY
+                    }
+                    
+                    if RoomsAndCorridors.canPlaceRoom(room, rooms, width, height) then
+                        RoomsAndCorridors.carveRoom(room, walkable)
+                        table.insert(rooms, room)
+                        break
+                    end
+                end
+            end
+        end
+    end
+end
+
+function RoomsAndCorridors.isAreaMostlyEmpty(startX, startY, endX, endY, walkable, rooms)
+    local totalCells = (endX - startX + 1) * (endY - startY + 1)
+    local occupiedCells = 0
+    
+    -- Count walkable cells (floors and corridors)
+    for y = startY, endY do
+        for x = startX, endX do
+            if walkable[y] and walkable[y][x] then
+                occupiedCells = occupiedCells + 1
+            end
+        end
+    end
+    
+    -- Count room overlap
+    for _, room in ipairs(rooms) do
+        local overlapStartX = math.max(startX, room.x)
+        local overlapStartY = math.max(startY, room.y)
+        local overlapEndX = math.min(endX, room.x + room.width - 1)
+        local overlapEndY = math.min(endY, room.y + room.height - 1)
+        
+        if overlapStartX <= overlapEndX and overlapStartY <= overlapEndY then
+            local overlapArea = (overlapEndX - overlapStartX + 1) * (overlapEndY - overlapStartY + 1)
+            occupiedCells = occupiedCells + overlapArea
+        end
+    end
+    
+    -- Area is mostly empty if less than 20% is occupied
+    return (occupiedCells / totalCells) < 0.2
+end
+
+function RoomsAndCorridors.canPlaceRoom(newRoom, existingRooms, mapWidth, mapHeight)
+    if newRoom.x < 2 or newRoom.y < 2 or 
+       newRoom.x + newRoom.width >= mapWidth or 
+       newRoom.y + newRoom.height >= mapHeight then
+        return false
+    end
+    
+    for _, room in ipairs(existingRooms) do
+        if RoomsAndCorridors.roomsOverlap(newRoom, room) then
+            return false
+        end
+    end
+    
+    return true
+end
+
+function RoomsAndCorridors.roomsOverlap(room1, room2)
+    local buffer = 2
+    return not (room1.x + room1.width + buffer < room2.x or
+                room2.x + room2.width + buffer < room1.x or
+                room1.y + room1.height + buffer < room2.y or
+                room2.y + room2.height + buffer < room1.y)
+end
+
+function RoomsAndCorridors.carveRoom(room, walkable)
+    for y = room.y + 1, room.y + room.height - 2 do
+        for x = room.x + 1, room.x + room.width - 2 do
+            walkable[y][x] = true
+        end
+    end
+end
+
+function RoomsAndCorridors.connectRooms(rooms, walkable)
+    local connected = {1}
+    local unconnected = {}
+    
+    for i = 2, #rooms do
+        table.insert(unconnected, i)
+    end
+    
+    while #unconnected > 0 do
+        local closestPair = RoomsAndCorridors.findClosestRoomPair(rooms, connected, unconnected)
+        local roomA = rooms[closestPair.connectedIndex]
+        local roomB = rooms[closestPair.unconnectedIndex]
+        
+        RoomsAndCorridors.createCorridor(roomA, roomB, walkable)
+        
+        table.insert(connected, closestPair.unconnectedIndex)
+        for i = #unconnected, 1, -1 do
+            if unconnected[i] == closestPair.unconnectedIndex then
+                table.remove(unconnected, i)
+                break
+            end
+        end
+    end
+    
+    RoomsAndCorridors.addExtraConnections(rooms, walkable)
+end
+
+function RoomsAndCorridors.findClosestRoomPair(rooms, connected, unconnected)
+    local minDistance = math.huge
+    local closestPair = {}
+    
+    for _, connectedIndex in ipairs(connected) do
+        for _, unconnectedIndex in ipairs(unconnected) do
+            local distance = RoomsAndCorridors.calculateRoomDistance(rooms[connectedIndex], rooms[unconnectedIndex])
+            if distance < minDistance then
+                minDistance = distance
+                closestPair = {
+                    connectedIndex = connectedIndex,
+                    unconnectedIndex = unconnectedIndex
+                }
+            end
+        end
+    end
+    
+    return closestPair
+end
+
+function RoomsAndCorridors.calculateRoomDistance(room1, room2)
+    local dx = room1.centerX - room2.centerX
+    local dy = room1.centerY - room2.centerY
+    return math.sqrt(dx * dx + dy * dy)
+end
+
+function RoomsAndCorridors.createCorridor(roomA, roomB, walkable)
+    local startX, startY = roomA.centerX, roomA.centerY
+    local endX, endY = roomB.centerX, roomB.centerY
+    
+    local currentX, currentY = startX, startY
+    
+    while currentX ~= endX do
+        walkable[currentY][currentX] = true
+        currentX = currentX + (currentX < endX and 1 or -1)
+    end
+    
+    while currentY ~= endY do
+        walkable[currentY][currentX] = true
+        currentY = currentY + (currentY < endY and 1 or -1)
+    end
+    
+    walkable[endY][endX] = true
+end
+
+function RoomsAndCorridors.addExtraConnections(rooms, walkable)
+    local extraConnections = math.min(3, math.floor(#rooms / 3))
+    
+    for i = 1, extraConnections do
+        local roomA = rooms[love.math.random(1, #rooms)]
+        local roomB = rooms[love.math.random(1, #rooms)]
+        
+        if roomA ~= roomB and love.math.random() < 0.3 then
+            RoomsAndCorridors.createCorridor(roomA, roomB, walkable)
+        end
+    end
+end
+
+function RoomsAndCorridors.addWalls(tileMap, walkable, width, height)
+    for y = 1, height do
+        for x = 1, width do
+            if walkable[y][x] then
+                RoomsAndCorridors.addWallsAroundTile(x, y, tileMap, width, height)
+            end
+        end
+    end
+end
+
+function RoomsAndCorridors.addWallsAroundTile(x, y, tileMap, width, height)
+    local directions = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}
+    
+    for _, dir in ipairs(directions) do
+        local newX, newY = x + dir[1], y + dir[2]
+        
+        if newX >= 1 and newX <= width and newY >= 1 and newY <= height then
+            if tileMap[newY][newX] == 3 then
+                tileMap[newY][newX] = 2
+            end
+        end
+    end
+end
+
+return RoomsAndCorridors
